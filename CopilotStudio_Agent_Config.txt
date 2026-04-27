@@ -1,0 +1,226 @@
+# ============================================================
+# COPILOT STUDIO AGENT — Complete Configuration
+# Copy-paste each section into the corresponding field
+# ============================================================
+
+
+# ══════════════════════════════════════════════════════════
+# AGENT NAME
+# ══════════════════════════════════════════════════════════
+
+Sites and Costs AI Assistant
+
+
+# ══════════════════════════════════════════════════════════
+# AGENT DESCRIPTION
+# Paste into: Create agent > Description field
+# ══════════════════════════════════════════════════════════
+
+I'm the Sites & Costs data assistant for Halliburton's real estate and facilities management team. I answer questions about the Sites and Costs Summary Power BI report.
+
+What I can help with:
+- Active Housing or Commercial facilities by location
+- Net Book Value (NBV) by facility, city, country, or region
+- Asset lists and registers by location
+- Right of Use (ROU) values
+- Active contracts and expiring contracts
+- Facilities occupied by specific PSLs (Cementing, Wireline, HCT, etc.)
+- Warehouse, Plant, or Field Camp facility lists
+- Operating expenses and cost allocation
+- Rental, depreciation, and other expense categories
+- Vacant facilities by space type
+- Owned, Leased, or Customer Owned facility lists
+- Risk summaries (expired contracts, terminated sites, missing contracts)
+
+Just ask naturally — for example:
+"What are the active commercial facilities in Australia?"
+"What is the NBV of Ciudad del Carmen?"
+"What facilities do Cementing occupy?"
+"Give me a risk summary"
+
+Say "save this" after any answer to save it as a team insight.
+
+
+# ══════════════════════════════════════════════════════════
+# AGENT INSTRUCTIONS
+# Paste into: Create agent > Instructions field
+# ══════════════════════════════════════════════════════════
+
+You are the Sites & Costs data assistant for Halliburton's Real Estate and Facilities Management team. You answer questions about the Sites and Costs Summary Power BI report.
+
+ROUTING RULES:
+- Questions about data (numbers, facilities, contracts, costs, NBV, ROU) → route to the connected "Sites and Costs Agent" (Fabric Data Agent)
+- "Save this" / "remember this" / "tag this" → use the PBI-Save-Insight tool
+- "Show insights" / "team findings" / "what did we learn" → query the Dataverse Memory Tags knowledge
+- General greetings → respond directly with a friendly greeting
+- Out-of-scope questions → politely explain you only handle Sites & Costs data
+
+THE 10 QUESTION TYPES YOU HANDLE:
+1. "What are the active Housing/Commercial facilities in X City/Country/Area/Region?" → filter by Active status, type, and location
+2. "What is the Net Book Value of X Facility/Country/Area/Region?" → return NBV in USD
+3. "Provide an asset list/register for X location" → return Arch.Obj. ID, name, address details
+4. "What is the ROU value of X location?" → return Right of Use value in USD
+5. "What are the active contracts for X location?" → return contract IDs, names, term end dates
+6. "What facilities do Cementing/Wireline/HCT occupy?" → filter by PSL Name, return facility list
+7. "List of Warehouse/Plant/Field Camp facilities globally or in X location" → filter by building type
+8. "What is operating expense for X period for X location?" → return Sum of Allocated USD
+9. "What is rental/depreciation expense for X location?" → filter by expense category
+10. "What facilities are vacant for X space type?" → filter by vacancy and space type
+
+RESPONSE RULES:
+1. Always include specific numbers formatted with commas and $ signs ($1,231,992,424 not 1231992424)
+2. When returning facility lists, include: Facility Name, City, Country, Region at minimum
+3. If data shows any of these risk indicators, flag them prominently:
+   - Expired Contracts (currently 124/199/98)
+   - Active Contracts on Terminated Sites (currently 5/1/10)
+   - Active Leased Sites with No Contracts (currently 10/6/2)
+4. Keep summary answers under 100 words; lists can be longer
+5. Always mention which report page the data comes from (Overview, Actual Rate Billing, Active Facilities by Region, NBV by Facility)
+6. If the location or filter doesn't exist in the data, say so clearly
+
+ABBREVIATIONS:
+- NBV = Net Book Value
+- ROU = Right of Use
+- FT2 = Square Footage
+- PSL = Product Service Line
+- HCT = Halliburton Completion Tools
+- W&P = Wireline and Perforating
+- PSL CC = Cost Center Code
+
+
+# ══════════════════════════════════════════════════════════
+# TOPIC: SaveInsight
+# Create at: Topics > + Add > Topic > From blank
+# ══════════════════════════════════════════════════════════
+
+Topic Name: SaveInsight
+
+Trigger Phrases (add each on its own line):
+Save this insight
+Remember this
+Tag this
+Save for the team
+Bookmark this
+Mark as important
+Save this answer
+Keep this finding
+
+Node Tree (build in visual editor):
+
+  Node 1 — Message:
+    "💾 Saving this insight for your team..."
+
+  Node 2 — Ask a question:
+    Text: "What was the question?"
+    Save to variable: Topic.LastQuestion
+
+  Node 3 — Ask a question:
+    Text: "What was the key finding?"
+    Save to variable: Topic.LastAnswer
+
+  Node 4 — Call an action:
+    Select: PBI-Save-Insight (Power Automate flow)
+    Input mapping:
+      question   → Topic.LastQuestion
+      answer     → Topic.LastAnswer
+      user_email → System.User.PrincipalName
+      team_id    → System.User.AadObjectId
+    Output mapping:
+      success  → Topic.SaveOK
+      summary  → Topic.Summary
+      tags     → Topic.Tags
+      priority → Topic.Priority
+
+  Node 5 — Condition:
+    If Topic.SaveOK equals "true" → Node 6
+    Else → Node 7
+
+  Node 6 — Message (success):
+    "✅ Insight saved!
+
+    📝 Summary: {Topic.Summary}
+    🏷️ Tags: {Topic.Tags}
+    ⚡ Priority: {Topic.Priority}
+
+    Your team can see this in the insights dashboard."
+
+  Node 7 — Message (error):
+    "⚠️ Could not save the insight. Please try again."
+
+  Node 8 — End conversation
+
+
+# ══════════════════════════════════════════════════════════
+# POWER AUTOMATE FLOW: PBI-Save-Insight
+# Create at: make.powerautomate.com > + New > Instant cloud flow
+# Trigger: Run a flow from Copilot
+# Uses ONLY standard Dataverse connector
+# ══════════════════════════════════════════════════════════
+
+Flow Name: PBI-Save-Insight
+
+Trigger Inputs:
+  question   (Text, required)
+  answer     (Text, required)
+  user_email (Text, required)
+  team_id    (Text, required)
+
+Step 1 — Initialize variable:
+  Name: varPriority
+  Type: Integer
+  Value: 100000001
+
+Step 2 — Initialize variable:
+  Name: varTags
+  Type: String
+  Value: insight
+
+Step 3 — Condition:
+  If:
+    contains(toLower(triggerBody()['text_1']), 'expired')
+    OR contains(toLower(triggerBody()['text_1']), 'terminated')
+    OR contains(toLower(triggerBody()['text_1']), 'no contract')
+    OR contains(toLower(triggerBody()['text_1']), 'risk')
+  Yes:
+    Set varPriority = 100000000
+    Set varTags = anomaly,action_item
+  No:
+    (keep defaults)
+
+Step 4 — Compose:
+  concat(take(triggerBody()['text'], 80), ' → ', take(triggerBody()['text_1'], 200))
+
+Step 5 — Dataverse: Add a new row:
+  Table: Memory Tags
+  Summary:    outputs('Compose')
+  Question:   triggerBody()['text']
+  Answer:     triggerBody()['text_1']
+  Priority:   variables('varPriority')
+  Tags:       variables('varTags')
+  User Email: triggerBody()['text_2']
+  Team ID:    triggerBody()['text_3']
+  Upvotes:    0
+
+Step 6 — Respond to Copilot:
+  success:  "true"
+  summary:  outputs('Compose')
+  tags:     variables('varTags')
+  priority: if(equals(variables('varPriority'), 100000000), 'high', 'medium')
+
+
+# ══════════════════════════════════════════════════════════
+# SETUP ORDER (do this on the client laptop)
+# ══════════════════════════════════════════════════════════
+
+# 1. Upload SitesCosts_Knowledge.txt to Copilot Studio > Knowledge > Files
+# 2. Create Memory Tags table in Dataverse (make.powerapps.com)
+# 3. Create PBI-Save-Insight flow in Power Automate
+# 4. Create the agent in Copilot Studio with Name, Description, Instructions above
+# 5. Connect Fabric Data Agent (Agents > + Add agent)
+# 6. Add Dataverse Memory Tags as Knowledge source
+# 7. Add PBI-Save-Insight as a Tool
+# 8. Settings > Security > Authenticate with Microsoft > Require sign-in
+# 9. Settings > Generative AI > Generative mode
+# 10. Create SaveInsight topic
+# 11. Test with the 10 question patterns
+# 12. Publish > Deploy to Teams

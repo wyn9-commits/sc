@@ -1,0 +1,244 @@
+# Halliburton Sites and Costs Summary — Knowledge Base
+# Upload this file to Copilot Studio > Knowledge > + Add knowledge > Files
+# This gives the agent complete context about the report
+
+## Report Overview
+
+The Sites and Costs Summary is a Power BI report used by Halliburton's Real Estate and Facilities Management team. It tracks global property assets, lease contracts, facility costs, and Net Book Values across all Halliburton operating regions.
+
+The report is located at: Power BI workspace ID df57b8cd-aa06-4892-91c3-a560be5031a8
+
+## Report Pages
+
+### Page 1: Overview
+The Overview page shows high-level KPIs in a table with three category columns. Key metrics displayed:
+
+- Presentation Site Count: 1,729 / 3,350 / 1,348
+- Building FT2 (square footage): 68,276,298 / 10,687,281 / 6,166,824
+- Land FT2: 6,383,389,414 / 50,496 / 0
+- NBV (Net Book Value): $1,231,992,424 / $6,221,452 / $44,437
+- ROU (Right of Use): $664,983,965 / $7,558,838 / $35,506,076
+- Contract Count: 650 / 451 / 238
+- Expired Contracts: 124 / 199 / 98
+- Expired Contracts no SR (no Service Request): 6 / 2 / 1
+- Active Contracts on Terminated Sites: 5 / 1 / 10
+- Active Leased Sites - No Contracts: 10 / 6 / 2
+- UNKNOWN value: $571,770
+- Terminated Sites with Acquisition Values: Yes
+
+Available slicers on the Overview page: Active/Unique Sites, Active/Terminated, Contract Category, Contract # and Name, Occupant, Active Sites with Contracts, Commercial/Housing, Impairments, Site & Name, PSL/Sub PSL, Term End, Main usage type, Property type, Region/Country/State/City/Address, Space Type.
+
+### Page 2: Actual Rate Billing
+Shows cost allocation data broken down by Region, Country, Facility Name, PSL Name, PSL CC, with measures Sum of Billable FT2, Sum of Allocated USD, and Sum of % of Site Cost.
+
+Sample data for Asia Pacific / Australia:
+- 503 Southern Road, Wireline and Perforating, PSL CC 7045410013: Billable FT2 2,228.13, Allocated USD 6,759.98, 100.00%
+- Brisbane Office Level 11, Wireline and Perforating, PSL CC 7048470600: Billable FT2 69.75, Allocated USD 652.47, 2.36%
+- Laydown Area, Wireline and Perforating, PSL CC 7048210013: Billable FT2 8,611.13, Allocated USD 761.90, 100.00%
+- Lot 9 Roma Downs Road, Wireline and Perforating, PSL CC 7045410005: Billable FT2 3,507.31, Allocated USD 7,050.54, 5.47%
+- Lot 9 Roma Downs Road, Wireline and Perforating, PSL CC 7045410013: Billable FT2 3,329.60, Allocated USD 6,689.63, 5.19%
+- Site 11 Karel Ave & Marriott Road Jan, Wireline and Perforating, PSL CC 7048470600: Billable FT2 54,529.11, Allocated USD 26,701.90, 16.50%
+- Site 11 Karel Ave & Marriott Road Jan, Wireline and Perforating, PSL CC 7965710005: Billable FT2 224.86, Allocated USD 113.29, 0.07%
+- Site 11 Karel Ave & Marriott Road Jan, Testing and Subsea, PSL CC 7048475500: Billable FT2 12,947.48, Allocated USD 6,343.73, 3.92%
+- Brisbane Office Level 11, Support, PSL CC 7044760600: Billable FT2 217.65, Allocated USD 2,034.76, 7.36%
+- Brisbane Office Level 11, Support, PSL CC 7044768010: Billable FT2 357.15, Allocated USD 3,339.65, 12.08%
+- Brisbane Office Level 11, Support, PSL CC 7044777700: Billable FT2 139.50, Allocated USD 1,304.90, 4.72%
+- Brisbane Office Level 11, Support, PSL CC 7045371501: Billable FT2 274.48, Allocated USD 2,565.56, 9.28%
+- Brisbane Office Level 11, Support, PSL CC 7048460500: Billable FT2 113.02, Allocated USD 1,056.08, 3.82%
+- Brisbane Office Level 11, Support, PSL CC 7048461000: Billable FT2 34.88, Allocated USD 326.22, 1.18%
+- Lot 9 Roma Downs Road, Support, PSL CC 7045460200: Billable FT2 10,251.98, Allocated USD 20,610.26, 15.99%
+- Lot 9 Roma Downs Road, Support, PSL CC 7045460600: Billable FT2 680.92, Allocated USD 1,366.29, 1.06%
+- Moomba, Support, PSL CC 7045260300: Billable FT2 2,152.78, Allocated USD 476.22, 5.00%
+- Site 11 Karel Ave & Marriott Road Jan, Support, PSL CC 7044660900: Billable FT2 47.36, Allocated USD 16.18, 0.01%
+
+Asia Pacific Australia Total: Billable FT2 736,192.05, Allocated USD 506,446.83, 1100.00%
+
+Available PSL Names: Baroid, Cementing, Completion Tools, Halliburton Drill Bits & Services, Halliburton Project Management, Landmark Software & Services, Wireline and Perforating, Support, Testing and Subsea.
+
+Available slicers: PSL CC, PSL Name, Sub PSL Name, Country, Site, Facility Name, Region.
+
+### Page 3: Active Facilities by Region
+Shows a bar chart of Count of Active Facilities across different regions, plus a detail table of contracts.
+
+When filtered to Cementing PSL: Facilities Count = 50.
+
+Regional distribution (Cementing):
+- Australasia: 10 (highest)
+- Indonesia: 9
+- Philippines: 5
+- Vietnam: 5
+- Kazakhstan: 4
+- Azerbaijan: 1
+- Cote d'Ivoire: 1
+- Kenya: 1
+- Senegal: 2
+- Angola: 3
+- Namibia: 2
+- Austria: 1
+- Denmark: 1
+- Germany: 4
+- Bolivia: 1
+- Chile: 1
+- Mexico: 6 (second highest in Latin America)
+- Oman: 1
+- Qatar: 1
+- Saudi Arabia: 1
+- South Africa: 1
+- Canada: 2
+- USA: 1
+- Plus other regions with 1 facility each
+
+Contract expiry detail (Cementing, Australia, 2025):
+- 12/4/2025: R003945, Flat 3 Rainwood Place, Australasia, Australia
+- 11/17/2025: R004159, Flat 7 Rainwood Place, Australasia, Australia
+- 12/19/2025: R005318, 3-73 Gregory Street, Australasia, Australia
+- 12/19/2025: R005319, 1-73 Gregory Street, Australasia, Australia
+- 12/19/2025: R005332, 2-73 Gregory Street, Australasia, Australia
+- 12/19/2025: R005333, 4-73 Gregory Street, Australasia, Australia
+- 11/27/2025: R008697, 1/18 Bassett Court Roma - Baroid, Australasia, Australia
+- 8/31/2025: R009051, Baroid Liquid Mud Plant - Broome, Australasia, Australia
+- 9/30/2025: R009062, Workstations - Melbourne, Australasia, Australia
+- 12/31/2025: R006874, NapaNapa Road Office, Australasia, Papua New Guinea
+
+Available slicers: Active Leased Sites w/No Contracts, Active/Unique Sites, Active/Terminated, PSL Name, Term End (year), Site and Name, Hemisphere/RE Region/MPL (Eastern, Western, Latin America, North America).
+
+### Page 4: NBV by Facility
+Shows Net Book Value information per architectural object (building/asset), with columns: Active/Terminated, Commercial/Housing, Arch.Obj. ID, Name of Architectural Object, Street, City, State, Region, Postal Code.
+
+Sample data (Western Hemisphere, Latin America, Active, Commercial):
+- A050295, Comodoro Bunker, Ruta 26 Cruce Ruta 3 y 26, Comodoro Rivadavia, CHU, U9003AFQ
+- A051696, La Meseta Field Camp, Departamento de Confluencia, Neuquen, NEU, Q8301XAB
+- A052355, Ciudad del Carmen Mud Plant, Calle 6 sur#4 Col., Ciudad del Carmen, CMP, 24140
+- A052494, Comodoro Field Camp Parking, Mazana IX Pedro Ortega, Comodoro Rivadavia, CHU, U9003AFQ
+- A053084, El Tigre Field Camp, Av. Peñalver, El Tigre, ANZ, 6050
+- A053792, Villavicencio Meta, Km 14 Via Villavicencio Puerto Lopez, VILLAVICENCIO (MET), SO
+- A053923, Latin America Regional Headquarters O, Av Paseo del Mar Edificio Capital Plaza 16th Floor, Panama City, PA
+- H002315, Ciudad del Carmen Field Camp, Calle 6 sur num. 2 Int. 2A Puerto Industrial Pesquero, Ciudad del Carmen, CMP, 24140
+- H002371, Comodoro Field Camp, Pedro P. Ortega 2663, Comodoro Rivadavia, CHU, U9003AFQ
+- H002390, Punta Quilla Land, Puerto Santa Cruz, Puerto Santa Cruz, SCR, 9300
+- H002392, Cañadon Seco Field Camp, Cañadon Seco, Cañadon Seco, SCR, 9013
+- H002393, Neuquen Field Camp, San Fernando y, Neuquen, NEU, Q8301XAB
+- H002396, Santa Cruz Field Camp, Km. 3.5 carr., Santa Cruz, SC
+- H002398, Yacuiba Field Camp, Propiedad "San Isidro", Yacuiba, TR
+- H002435, Yopal Field Camp, Kilometro 2 Via Morichal, YOPAL (CAS), BS
+- H002450, Neiva Field Camp, Cra 7P # 24-98, NEIVA (HUI), 41
+- H002454, Coca Field Camp Compound, Av. Alejandro Labaka Km 5 ½ Via a Lago Agrio, Francisco de Orellana, ORE, 220202
+- H002464, Reforma Field Camp, Carretera Reforma a Boca Limon km 2.49 Lote 1, Reforma, CHS, 29500
+- H002513, San Fernando Field Camp, Coconut Drive Cross Crossing, San Fernando, SAN
+- R000033, Country Headquarters Office, Av. Amazonas N37-29 y Villalengua, Quito, PIC, 170135
+- R000050, Ciudad del Carmen Bunker, Carretera Carmen - Puerto Real S/N KM21, Ciudad del Carmen, CMP, 24327
+- R000623, Cota Field Camp, Parque Empresarial Potreros Chico, COTA (CUN), 25
+- R001760, Reforma Bunker, Ranchería anacleto canabal Km 7.5, Villahermosa, TAB, 86103
+- R002013, Reynosa Bunker, Carr a Monterrey Km. 196, Reynosa, TMS, 88710
+- R002171, Staatsolie Premises - Saramacca, Gangaram Pandayweg - TA58, Saramacca, DIS
+- R003446, Villahermosa RIM storage, San Lucas Mza 2 Lote 23 Bodega 2, Villahermosa, TAB, 86103
+- R003692, Santa Cruz Warehouse, Parque Industrial, Santa Cruz, SC
+- R004600, Cunduacan Field Camp, Av. Circuito Tabasco Oriente S/N, Cunduacán, TAB, 86693
+- R004794, El Tigre Land, Prolongacion Calle Andres Eloy Blanco.Se, El Tigre, ANZ, 6050
+- R004950, Maturin Land, Manzana 17 Parcela 11,12,13 y 14 del, Maturin, MON, 6201
+- R006625, Country Headquarters Office, San Martin 344, Buenos Aires, BUA, 1414
+
+Available slicers: Active Leased Sites w/N, Active/Unique Sites, Active/Terminated, Site and Name, Hemisphere/RE Region, Term End Date.
+
+## Dimensions and Filter Values
+
+### Regions
+Asia Pacific, Latin America, Europe, North America, Middle East, Africa, Australasia, Eurasia, Europe Sub-Saharan Africa
+
+### Hemispheres
+Eastern, Western
+
+### RE Regions / MPL
+Australasia, Indonesia, Southeast Asia, Caspian, Africa Other North, Africa Other (South), Europe, Latin America, East Mediterranean, Qatar, Saudi Arabia, South Asia, Canada, North America
+
+### PSL Names (Product Service Lines)
+Baroid, Cementing, Completion Tools, Halliburton Drill Bits & Services, Halliburton Project Management, Landmark Software & Services, Wireline and Perforating, Support, Testing and Subsea
+
+### Sub PSL Names
+Baroid Drill Fluids Field Engr, Baroid Drill Fluids Services, Baroid Separation Solutions Fld Eng/Tech, Business Development, Cementing Deepwater Services, Cementing Land Services, and others
+
+### Countries (partial list)
+Australia, Albania, Algeria, Angola, Argentina, Azerbaijan, Bolivia, Brazil, Canada, Chile, Colombia, Cote d'Ivoire, Denmark, Ecuador, Egypt, Germany, Indonesia, Kazakhstan, Kenya, Mexico, Namibia, Nigeria, Oman, Papua New Guinea, Peru, Philippines, Qatar, Saudi Arabia, Senegal, South Africa, Suriname, Trinidad, Turkey, UAE, UK, USA, Venezuela, Vietnam
+
+## Common Abbreviations
+
+- NBV: Net Book Value — the book value of a physical asset in USD
+- ROU: Right of Use — the value of a lease obligation in USD
+- FT2: Square footage — building or land area measurement
+- PSL: Product Service Line — Halliburton's business unit categorization
+- PSL CC: PSL Cost Center — the cost center code for each PSL
+- Sub PSL: Sub-division within a Product Service Line
+- HCT: Halliburton Completion Tools (a PSL)
+- W&P: Wireline and Perforating (a PSL)
+- SR: Service Request
+- Arch.Obj. ID: Architectural Object ID — unique identifier for a physical building or asset
+- RE Region: Real Estate Region
+- MPL: Market Planning Level
+- CMP: Ciudad del Carmen (region code)
+- CHU: Chubut province, Argentina (region code)
+- NEU: Neuquen province, Argentina (region code)
+- ANZ: Anzoátegui state, Venezuela (region code)
+
+## Top 10 Question Patterns
+
+These are the most frequently asked questions by the facilities management team:
+
+### 1. Active Housing/Commercial facilities in a location
+Example: "What are the active Housing/Commercial facilities in X City/Country/Area/Region?"
+Answer approach: Filter by Active/Terminated = Active, then by Commercial/Housing type, then by the specified location. Return facility names, cities, and site IDs.
+
+### 2. Net Book Value of a location
+Example: "What is the Net Book Value of X Facility/Country/Area/Region?"
+Answer approach: Sum the NBV measure filtered by the specified location. Format as USD with commas. Refer to the NBV by Facility page.
+
+### 3. Asset list or register for a location
+Example: "Provide an asset list/register for X Facility/Country/Area/Region."
+Answer approach: List all architectural objects (Arch.Obj. ID, Name of Architectural Object, Street, City, State, Postal Code) filtered by the specified location. Refer to the NBV by Facility page.
+
+### 4. ROU value of a location
+Example: "What is the ROU value of X Facility/Country/Area/Region?"
+Answer approach: Return the ROU measure filtered by the specified location. Format as USD with commas. Refer to the Overview page.
+
+### 5. Active contracts for a location
+Example: "What are the active contracts for X Facility/Country/Area/Region?"
+Answer approach: List Contract # and Name, Contract Category, and Term End date, filtered by Active status and the specified location. Refer to the Active Facilities by Region page.
+
+### 6. Facilities occupied by a PSL
+Example: "What facilities do Cementing/Wireline/HCT/etc. occupy?"
+Answer approach: Filter by PSL Name and return facility names, regions, and countries along with the Facilities Count. Refer to the Active Facilities by Region page.
+
+### 7. Facilities by building type
+Example: "Provide a list of Warehouse/Plant/Manufacturing/etc. facilities globally or in X Facility/Country/Area/Region."
+Answer approach: Filter by the building/usage type (Space Type or Main Usage Type) and optionally by location. Return facility names with full location details.
+
+### 8. Operating expense for a time period and location
+Example: "What is operating expense for X period of time for Facility/Country/Area/Region?"
+Answer approach: Return Sum of Allocated USD filtered by the specified location and time period. Include Sum of Billable FT2 for context. Refer to the Actual Rate Billing page.
+
+### 9. Specific expense category for a location
+Example: "What is the rental/depreciation/janitorial/etc. expense for X Facility/Country/Area/Region?"
+Answer approach: Filter by the expense/cost category and location, then return the allocated USD amounts. Refer to the Actual Rate Billing page.
+
+### 10. Vacant facilities
+Example: "What facilities are vacant for X space type?"
+Answer approach: Filter by the Space Type and vacant/unoccupied status. Return facility names and location details.
+
+### Additional patterns
+- "Provide a list of Owned/Leased/Customer Owned facilities globally or in X location" — filter by ownership/contract type and location.
+- "Provide a list of active housing/commercial facilities in X location for a specific time period in the past" — filter by type, location, and time period.
+
+## Risk Indicators
+
+When data shows any of the following, flag them clearly as risks:
+
+1. Expired Contracts (currently 124 / 199 / 98 across categories): These are contracts past their term end date. High count indicates a renewal backlog that may cause compliance issues.
+
+2. Active Contracts on Terminated Sites (currently 5 / 1 / 10): These are contracts still active on sites that have been marked as terminated. This is a compliance and financial risk — the organization may be paying for sites no longer in use.
+
+3. Active Leased Sites - No Contracts (currently 10 / 6 / 2): These are sites that are actively leased but have no associated contract in the system. This is a governance gap — the organization has lease obligations without documented agreements.
+
+4. Expired Contracts no SR (currently 6 / 2 / 1): Expired contracts without a service request filed to renew or terminate them. These need immediate attention.
+
+## Data Currency
+
+This knowledge base reflects data as of April 27, 2026. The Power BI report refreshes regularly. For the most current numbers, the agent should query the live semantic model through the Fabric Data Agent connection.
