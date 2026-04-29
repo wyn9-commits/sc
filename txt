@@ -2,4 +2,4 @@
 
 
 
-@or(contains(toLower(triggerBody()['text_1']), 'expired'), contains(toLower(triggerBody()['text_1']), 'terminated'), contains(toLower(triggerBody()['text_1']), 'no contract'), contains(toLower(triggerBody()['text_1']), 'risk'))
+concat(take(triggerBody()['text'], 80), ' → ', take(triggerBody()['text_1'], 200))
