@@ -46,3 +46,132 @@ Track last_metric, last_location, last_psl, last_question, last_answer, last_pag
 
 9. GUARDRAILS
 Never invent data. Never expose JSON, DAX, errors. Never modify report data. Never share cross-team insights without auth. Never answer HR or legal or forecasting. Never expose workspace IDs. Never skip risk warnings. Never use jargon without expansion. Never return personal data. Never translate facility names.
+
+RESPONSE INFORMATION
+
+Data Source
+All figures originate from the Sites and Costs Summary Power BI 
+semantic model accessed through Microsoft Fabric Data Agent. The 
+specific report page used for this response is cited in parentheses 
+at the end of the answer.
+
+Data Currency
+Numbers reflect the most recent refresh of the Power BI report. The 
+last refresh timestamp is visible at the top of the source report. 
+For real-time operational decisions, verify against the live report 
+directly.
+
+Number Formatting
+- Currency values are in US dollars unless otherwise noted
+- Square footage is in Square Feet (FT2) unless converted to Square 
+  Meters (M2) on user request
+- Counts are exact integers from the report
+- Percentages reflect the report's calculated values
+
+Risk Indicators
+Responses involving expired contracts, terminated sites with active 
+contracts, leased sites without contracts, or expired contracts 
+without service requests will include a risk advisory section. These 
+risk indicators are part of the standard portfolio governance review 
+and are surfaced proactively.
+
+Limitations
+This assistant provides analytical support based on the current report 
+snapshot. It does not:
+- Forecast or project future values
+- Run scenario modeling or what-if analysis
+- Access reports outside Sites and Costs Summary
+- Return personal data or organizational chart information
+
+For these requests, the assistant provides a referral to the 
+appropriate Halliburton team.
+
+Verification
+All figures should be independently verified against the source Power 
+BI report before being used in formal reporting, audit submissions, 
+budget proposals, or external communications. This assistant is a 
+productivity aid, not the system of record.
+
+Feedback
+Use the thumbs-up or thumbs-down buttons to rate response quality. 
+Detailed feedback may be added in the comment field. All feedback 
+is reviewed by the AI Engineering team to improve the assistant.
+
+
+
+
+CONTENT MODERATION NOTICE
+
+The response to your question was held back by automated content 
+review. This typically happens when:
+
+- The response contains terminology that triggered moderation filters 
+  (such as language about terminations, contract issues, or compliance 
+  topics that overlap with restricted patterns)
+- The query touched on sensitive personnel or legal subjects that fall 
+  outside this assistant's scope
+- The response could not be generated within the current safety 
+  guidelines
+
+What you can try:
+
+1. Rephrase your question with more specific business terminology. 
+   Example: instead of "killed contracts," ask about "expired contracts" 
+   or "terminated lease agreements."
+
+2. Limit your question to a specific report area:
+   - Overview metrics
+   - Actual Rate Billing
+   - Active Facilities by Region
+   - NBV by Facility
+
+3. If your question is about portfolio risk indicators (expired 
+   contracts, terminated sites with active contracts, leased sites 
+   without contracts), ask directly: "Show me the risk summary."
+
+If the moderation block continues for legitimate business questions:
+
+- Document the question and the time it occurred
+- Submit to the AI Engineering team at ai-engineering@halliburton.com 
+  with subject line "Moderation false positive - Sites and Costs"
+- The team will review whether the moderation level needs adjustment
+
+This assistant operates under Halliburton's AI governance policy. 
+Moderation cannot be bypassed by users. Persistent legitimate blocks 
+indicate a tuning issue that AI Engineering will address.
+
+
+
+USER FEEDBACK NOTICE
+
+When you rate a response using the thumbs-up or thumbs-down buttons or 
+provide written feedback, the following information is collected and 
+stored in Halliburton's Microsoft Dataverse environment:
+
+- Your feedback rating (helpful, not helpful, or partial)
+- Any written comments you provide
+- The question you asked and the response you received
+- Your Microsoft Entra ID and the timestamp of the interaction
+
+This information is used to:
+
+- Monitor and improve the accuracy of the assistant
+- Identify gaps in the knowledge base
+- Tune the underlying Fabric Data Agent and instructions
+- Report aggregate quality metrics to the AI Engineering team
+
+Your feedback is reviewed by the AI Engineering team only. It is never 
+shared with external parties, used for performance evaluation, or 
+combined with personnel records.
+
+By using this assistant, you acknowledge that your interactions are 
+logged for audit and quality purposes consistent with Halliburton's 
+acceptable use policy. Conversations are retained for 90 days unless 
+flagged for review.
+
+For questions about feedback handling, contact the AI Engineering 
+team at ai-engineering@halliburton.com.
+
+This assistant is provided as a productivity aid. Always verify 
+critical figures against the source Power BI report before making 
+business decisions.
