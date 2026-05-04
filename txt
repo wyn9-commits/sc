@@ -83,3 +83,16 @@ Team insight storage for the Sites and Costs AI Assistant. Contains question and
 
 
 EVALUATE ROW("Presentation Site Count", [Presentation Site Count], "Building FT2", [Building FT2], "Land FT2", [Land FT2], "NBV", [NBV], "ROU", [ROU], "Contract Count", [Contract Count], "Expired Contracts", [Expired Contracts], "Expired Contracts no SR", [Expired Contracts no SR], "Active Contracts on Terminated Sites", [Active Contracts on Terminated Sites], "Active Leased Sites No Contracts", [Active Leased Sites - No Contracts])
+
+
+
+Queries live data from the Halliburton Sites and Costs Summary Power BI semantic model. Use this tool whenever the user asks about site counts, NBV (Net Book Value), ROU (Right of Use), expired contracts, building square footage, land square footage, contract counts, billing allocations, facilities, PSL coverage, costs, expenses, asset registers, or risk indicators.
+
+When generating DAX queries, use EVALUATE with these available measures:
+[Presentation Site Count], [Building FT2], [Land FT2], [NBV], [ROU], [Contract Count], [Expired Contracts], [Expired Contracts no SR], [Active Contracts on Terminated Sites], [Active Leased Sites - No Contracts], [Facilities Count], [Sum of Billable FT2], [Sum of Allocated USD], [Sum of % of Site Cost]
+
+Example DAX queries:
+For overview KPIs: EVALUATE ROW("NBV", [NBV], "ROU", [ROU], "Expired", [Expired Contracts])
+For NBV by city: EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('NBV'[City], 'NBV'[Name of Architectural Object], "NBV", [NBV]), 'NBV'[City] = "Comodoro Rivadavia")
+For billing by region: EVALUATE SUMMARIZECOLUMNS('Billing'[Region], 'Billing'[Country], "Cost", [Sum of Allocated USD])
+For facilities by PSL: EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Facilities'[Region], 'Facilities'[Country], "Count", [Facilities Count]), 'Billing'[PSL Name] = "Cementing")
