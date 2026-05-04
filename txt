@@ -78,3 +78,8 @@ Paste into: Knowledge > Dataverse entry > Description field
 ================================================================
 
 Team insight storage for the Sites and Costs AI Assistant. Contains question and answer pairs saved by team members during previous sessions. Each entry has a summary, the original question, the answer, a priority level (high medium or low), tags (insight anomaly action_item), and the date saved. Query this source when the user asks to show team insights, past findings, saved answers, what the team learned, or previously bookmarked information. Sort results by date descending and return the most recent entries.
+
+
+
+
+EVALUATE ROW("Presentation Site Count", [Presentation Site Count], "Building FT2", [Building FT2], "Land FT2", [Land FT2], "NBV", [NBV], "ROU", [ROU], "Contract Count", [Contract Count], "Expired Contracts", [Expired Contracts], "Expired Contracts no SR", [Expired Contracts no SR], "Active Contracts on Terminated Sites", [Active Contracts on Terminated Sites], "Active Leased Sites No Contracts", [Active Leased Sites - No Contracts])
