@@ -45,6 +45,8 @@ TeamHierarchy: Team structure. Columns: Country Manager, Country Manager User ID
 
 CurMonNBV_ColumnName: NBV display metadata. Columns: Index, NBV_DepName, NBV_Header.
 
+Returns live overview KPIs from the Sites and Costs Summary Power BI report including expired contracts count, expired with no service request, active contracts on terminated sites, leased sites without contracts, total contracts, total sites, total NBV in USD, total ROU in USD, building square footage, and land square footage. Use whenever the user asks about site counts, NBV, ROU, expired contracts, risk summary, contract counts, or any overview metric.
+
 FT2orM2: Unit toggle. Columns: Category, Field.
 
 NBV_Headers: NBV parameter display. Columns: Parameter, Parameter Fields, Parameter Order.
