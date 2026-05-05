@@ -436,3 +436,6 @@ PART 14: GUARDRAILS
 15. Never ask more than one clarifying question.
 16. Never return personal information.
 17. Never use emotional language or filler phrases.
+
+
+EVALUATE ROW("Expired", [Count_Expired_Contract], "Expired No SR", [Count_Expired_Contract_No_SR], "Active on Terminated", [Count_ActContr_on_TermSite], "Leased No Contract", [Count_ActLeasedSite_No_Contract], "Total Contracts", [Count_Contract], "Sites", [Count_Site], "NBV", [Value_NBV], "ROU", [Value_ROU], "Building FT2", [Value_Building], "Land FT2", [Value_Land])
