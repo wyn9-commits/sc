@@ -448,3 +448,6 @@ EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CA
 
 
 EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]), "Building FT2", CALCULATE([Value_Building]), "Land FT2", CALCULATE([Value_Land]))
+
+
+Returns live overview KPIs from the Sites and Costs Summary Power BI report including expired contracts count, expired with no service request, active contracts on terminated sites, leased sites without contracts, total contracts, total sites, total NBV in USD, total ROU in USD, building square footage, and land square footage. Use whenever the user asks about site counts, NBV, ROU, expired contracts, risk summary, contract counts, or any overview metric.
