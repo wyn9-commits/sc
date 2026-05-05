@@ -439,3 +439,7 @@ PART 14: GUARDRAILS
 
 
 EVALUATE ROW("Expired", [Count_Expired_Contract], "Expired No SR", [Count_Expired_Contract_No_SR], "Active on Terminated", [Count_ActContr_on_TermSite], "Leased No Contract", [Count_ActLeasedSite_No_Contract], "Total Contracts", [Count_Contract], "Sites", [Count_Site], "NBV", [Value_NBV], "ROU", [Value_ROU], "Building FT2", [Value_Building], "Land FT2", [Value_Land])
+
+
+
+EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]))
