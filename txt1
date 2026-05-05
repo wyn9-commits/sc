@@ -443,3 +443,6 @@ EVALUATE ROW("Expired", [Count_Expired_Contract], "Expired No SR", [Count_Expire
 
 
 EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]))
+
+
+EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]), "Building FT2", CALCULATE([Value_Building]), "Land FT2", CALCULATE([Value_Land]))
