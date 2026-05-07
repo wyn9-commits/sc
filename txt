@@ -1,1 +1,347 @@
-EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "Presentation Sites", CALCULATE([Count_Presentation]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]), "Building FT2", CALCULATE([Value_Building]), "Land FT2", CALCULATE([Value_Land]), "NBV CY", CALCULATE([NBV_CY]), "NBV NY", CALCULATE([NBV_NY]), "NBV N2Y", CALCULATE([NBV_N2Y]), "NBV N3Y", CALCULATE([NBV_N3Y]), "NBV N4Y", CALCULATE([NBV_N4Y]), "NBV Total", CALCULATE([NBV_TotalAsset]), "ROU CY", CALCULATE(SUM('CurMonData'[Current Year ROU])), "ROU Dec PY", CALCULATE(SUM('CurMonData'[December Prior Year ROU])), "ROU NY", CALCULATE(SUM('CurMonData'[Next year ROU])), "ROU N2Y", CALCULATE(SUM('CurMonData'[Next 2 years ROU])), "ROU N3Y", CALCULATE(SUM('CurMonData'[Next 3 years ROU])), "ROU N4Y", CALCULATE(SUM('CurMonData'[Next 4 years ROU])), "ROU Asset", CALCULATE(SUM('CurMonData'[ROU Asset Value])), "Rental CY", CALCULATE(SUM('CurMonData'[Rental Expense - Current Year])), "Rental PY", CALCULATE(SUM('CurMonData'[Rental Expense - Prior Year])), "Depreciation CY", CALCULATE(SUM('CurMonData'[Depreciation - Current Year])), "Depreciation PY", CALCULATE(SUM('CurMonData'[Depreciation - Prior Year])), "Janitorial CY", CALCULATE(SUM('CurMonData'[Janitorial - Current Year])), "Janitorial PY", CALCULATE(SUM('CurMonData'[Janitorial - Prior Year])), "Insurance CY", CALCULATE(SUM('CurMonData'[Insurance - Current Year])), "Insurance PY", CALCULATE(SUM('CurMonData'[Insurance - Prior Year])), "Facility Cost CY", CALCULATE(SUM('CurMonData'[Facility Cost - Current Year])), "Facility Cost PY", CALCULATE(SUM('CurMonData'[Facility Cost - Prior Year])), "Total Expenses CY", CALCULATE(SUM('CurMonData'[Total Current Year Expenses YTD])), "Total Expenses PY", CALCULATE(SUM('CurMonData'[Total Prior Year Expenses])), "Wireline", CALCULATE(SUM('CurMonData'[Wireline and Perforating])), "Cementing", CALCULATE(SUM('CurMonData'[Cementing])), "Support", CALCULATE(SUM('CurMonData'[Support])), "Testing", CALCULATE(SUM('CurMonData'[Testing and Subsea])), "Baroid", CALCULATE(SUM('CurMonData'[Baroid])), "Drill Bits", CALCULATE(SUM('CurMonData'[Halliburton Drill Bits & Services])), "Project Mgmt", CALCULATE(SUM('CurMonData'[Halliburton Project Management])), "Landmark", CALCULATE(SUM('CurMonData'[Landmark Software & Services])), "Completion", CALCULATE(SUM('CurMonData'[Completion Tools])), "Building Assets", CALCULATE(SUM('CurMonData'[Building Assets])), "Land Assets", CALCULATE(SUM('CurMonData'[Land Assets])), "Total Assets", CALCULATE(SUM('CurMonData'[Total Assets])), "Regular Employees", CALCULATE(SUM('CurMonData'[Regular Employees])), "Total Employees", CALCULATE(SUM('CurMonData'[TOTAL Active Employees])))
+COMPLETE DAX QUERY LIBRARY
+Every filter combination for all question patterns
+Replace the filter value in quotes with any valid value
+
+
+========================================
+PATTERN 1: ACTIVE FACILITIES
+========================================
+
+By Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region], 'CurMonData'[Main usage type]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Country Name] = "Australia")
+
+By Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Main usage type]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Region] = "Asia Pacific")
+
+By City:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[Country Name], 'CurMonData'[Main usage type]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[City] = "Comodoro Rivadavia")
+
+By Type (Commercial):
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Commercial / Housing] = "Commercial")
+
+By Type (Housing):
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Commercial / Housing] = "Housing")
+
+Commercial by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Main usage type]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Commercial / Housing] = "Commercial", 'CurMonData'[Country Name] = "Australia")
+
+Housing by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Main usage type]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Commercial / Housing] = "Housing", 'CurMonData'[Country Name] = "Australia")
+
+Commercial by Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Commercial / Housing] = "Commercial", 'CurMonData'[Region] = "Latin America")
+
+Terminated facilities by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Terminated", 'CurMonData'[Country Name] = "Australia")
+
+All Active globally:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Active/Terminated] = "Active")
+
+By Hemisphere:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Hemisphere] = "Eastern")
+
+By Usage Type:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Main usage type] = "Office")
+
+By RE Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[RE Region] = "Australasia")
+
+
+========================================
+PATTERN 2: NET BOOK VALUE
+========================================
+
+Total NBV:
+EVALUATE ROW("NBV", CALCULATE([Value_NBV]))
+
+By City:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonNBV'[Arch.Obj. ID], 'CurMonNBV'[Name of Architectural Object], 'CurMonNBV'[City], 'CurMonNBV'[Street], "NBV", SUM('CurMonNBV'[Current Year NBV]), "Next Year", SUM('CurMonNBV'[Next Year NBV]), "Total Assets", SUM('CurMonNBV'[Total Assets])), 'CurMonNBV'[City] = "Ciudad del Carmen")
+
+By Status:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonNBV'[City], "NBV", SUM('CurMonNBV'[Current Year NBV]), "Total Assets", SUM('CurMonNBV'[Total Assets])), 'CurMonNBV'[Status] = "Active")
+
+By Category:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonNBV'[Category], 'CurMonNBV'[City], "NBV", SUM('CurMonNBV'[Current Year NBV])), 'CurMonNBV'[Category] = "Commercial")
+
+All NBV by City (grouped):
+EVALUATE SUMMARIZECOLUMNS('CurMonNBV'[City], "NBV", SUM('CurMonNBV'[Current Year NBV]), "Next Year", SUM('CurMonNBV'[Next Year NBV]), "Total Assets", SUM('CurMonNBV'[Total Assets]))
+
+NBV Projection:
+EVALUATE ROW("NBV CY", CALCULATE([NBV_CY]), "NBV NY", CALCULATE([NBV_NY]), "NBV N2Y", CALCULATE([NBV_N2Y]), "NBV N3Y", CALCULATE([NBV_N3Y]), "NBV N4Y", CALCULATE([NBV_N4Y]), "NBV Total", CALCULATE([NBV_TotalAsset]))
+
+Top 10 NBV facilities:
+EVALUATE TOPN(10, SUMMARIZECOLUMNS('CurMonNBV'[Name of Architectural Object], 'CurMonNBV'[City], "NBV", SUM('CurMonNBV'[Current Year NBV])), [NBV], DESC)
+
+
+========================================
+PATTERN 3: ASSET REGISTER
+========================================
+
+By City:
+EVALUATE FILTER('Need Attention', 'Need Attention'[City] = "Comodoro Rivadavia")
+
+By Country:
+EVALUATE FILTER('Need Attention', 'Need Attention'[Country Name] = "Australia")
+
+By Region:
+EVALUATE FILTER('Need Attention', 'Need Attention'[Region] = "Asia Pacific")
+
+By Active Status:
+EVALUATE FILTER('Need Attention', 'Need Attention'[Active/Terminated] = "Active")
+
+By Commercial/Housing:
+EVALUATE CALCULATETABLE('Need Attention', 'Need Attention'[Active/Terminated] = "Active", 'Need Attention'[Commercial / Housing] = "Commercial")
+
+By Hemisphere:
+EVALUATE FILTER('Need Attention', 'Need Attention'[Hemisphere] = "Eastern")
+
+By RE Region:
+EVALUATE FILTER('Need Attention', 'Need Attention'[RE Region] = "Australasia")
+
+Specific Facility by Arch.Obj. ID:
+EVALUATE FILTER('Need Attention', 'Need Attention'[Arch.Obj. ID] = "A050295")
+
+All Facilities (full register):
+EVALUATE SUMMARIZECOLUMNS('Need Attention'[Arch.Obj. ID], 'Need Attention'[Name of Architectural Object], 'Need Attention'[City], 'Need Attention'[Street], 'Need Attention'[Region], 'Need Attention'[Country Name], 'Need Attention'[Active/Terminated], 'Need Attention'[Commercial / Housing])
+
+
+========================================
+PATTERN 4: ROU VALUE
+========================================
+
+Total ROU:
+EVALUATE ROW("ROU", CALCULATE([Value_ROU]))
+
+ROU by Region:
+EVALUATE CALCULATETABLE(ROW("ROU", SUM('CurMonData'[Current Year ROU])), 'CurMonData'[Region] = "Asia Pacific")
+
+ROU by Country:
+EVALUATE CALCULATETABLE(ROW("ROU", SUM('CurMonData'[Current Year ROU])), 'CurMonData'[Country Name] = "Australia")
+
+ROU by City:
+EVALUATE CALCULATETABLE(ROW("ROU", SUM('CurMonData'[Current Year ROU])), 'CurMonData'[City] = "Comodoro Rivadavia")
+
+ROU Projection:
+EVALUATE ROW("ROU CY", CALCULATE(SUM('CurMonData'[Current Year ROU])), "ROU Dec PY", CALCULATE(SUM('CurMonData'[December Prior Year ROU])), "ROU NY", CALCULATE(SUM('CurMonData'[Next year ROU])), "ROU N2Y", CALCULATE(SUM('CurMonData'[Next 2 years ROU])), "ROU N3Y", CALCULATE(SUM('CurMonData'[Next 3 years ROU])), "ROU N4Y", CALCULATE(SUM('CurMonData'[Next 4 years ROU])))
+
+ROU by Region grouped:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Region], "ROU", SUM('CurMonData'[Current Year ROU]))
+
+ROU by Country grouped:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Country Name], "ROU", SUM('CurMonData'[Current Year ROU]))
+
+
+========================================
+PATTERN 5: ACTIVE CONTRACTS
+========================================
+
+By Site Name:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Site and Name] = "Brisbane Office Level 11")
+
+By Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[City]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Country Name] = "Australia")
+
+By Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Region] = "Asia Pacific")
+
+By City:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[City] = "Comodoro Rivadavia")
+
+Expired Contracts:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Term End] < TODAY())
+
+All Active Contracts:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active")
+
+Contracts by Hemisphere:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name], 'CurMonData'[Term End], 'CurMonData'[Site and Name], 'CurMonData'[Country Name]), 'CurMonData'[Active/Terminated] = "Active", 'CurMonData'[Hemisphere] = "Eastern")
+
+
+========================================
+PATTERN 6: FACILITIES BY PSL
+========================================
+
+Cementing:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Cementing")
+
+Wireline and Perforating:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Wireline and Perforating")
+
+Support:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Support")
+
+Testing and Subsea:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Testing and Subsea")
+
+Baroid:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Baroid")
+
+Halliburton Drill Bits and Services:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Halliburton Drill Bits & Services")
+
+Halliburton Project Management:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Halliburton Project Management")
+
+Landmark Software and Services:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Landmark Software & Services")
+
+Completion Tools:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[PSL Name] = "Completion Tools")
+
+PSL by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Facility Name], 'Billing File'[PSL Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[Country] = "Australia")
+
+PSL by Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Country], 'Billing File'[Facility Name], 'Billing File'[PSL Name], "Cost", SUM('Billing File'[Allocated USD])), 'Billing File'[Region] = "Asia Pacific")
+
+All PSLs grouped:
+EVALUATE SUMMARIZECOLUMNS('Billing File'[PSL Name], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2]))
+
+
+========================================
+PATTERN 7: FACILITIES BY TYPE
+========================================
+
+Field Camp globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Field Camp"))
+
+Warehouse globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Warehouse"))
+
+Bunker globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Bunker"))
+
+Office globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Office"))
+
+Mud Plant globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Mud Plant"))
+
+Land globally:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Land"))
+
+Field Camp by Country:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Field Camp") && 'CurMonData'[Country Name] = "Australia")
+
+Field Camp by Region:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), CONTAINSSTRING('CurMonData'[Site and Name], "Field Camp") && 'CurMonData'[Region] = "Latin America")
+
+By Main Usage Type:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Main usage type] = "Office")
+
+By Property Type:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[City], 'CurMonData'[Country Name], 'CurMonData'[Region]), 'CurMonData'[Property type] = "Leased")
+
+
+========================================
+PATTERN 8: OPERATING EXPENSE
+========================================
+
+By Region and Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Facility Name], 'Billing File'[PSL Name], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2])), 'Billing File'[Region] = "Asia Pacific", 'Billing File'[Country] = "Australia")
+
+By Country only:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Facility Name], 'Billing File'[PSL Name], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2])), 'Billing File'[Country] = "Australia")
+
+By Region only:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2])), 'Billing File'[Region] = "Asia Pacific")
+
+By Facility:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[PSL Name], 'Billing File'[PSL CC], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2]), "Pct", SUM('Billing File'[% of Site Cost])), 'Billing File'[Facility Name] = "Brisbane Office Level 11")
+
+By PSL:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region], 'Billing File'[Country], 'Billing File'[Facility Name], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2])), 'Billing File'[PSL Name] = "Cementing")
+
+All Billing grouped by Region:
+EVALUATE SUMMARIZECOLUMNS('Billing File'[Region], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2]))
+
+All Billing grouped by Country:
+EVALUATE SUMMARIZECOLUMNS('Billing File'[Country], "Cost", SUM('Billing File'[Allocated USD]), "FT2", SUM('Billing File'[Billable FT2]))
+
+Top 10 most expensive facilities:
+EVALUATE TOPN(10, SUMMARIZECOLUMNS('Billing File'[Facility Name], 'Billing File'[Country], "Cost", SUM('Billing File'[Allocated USD])), [Cost], DESC)
+
+
+========================================
+PATTERN 9: EXPENSE BY CATEGORY
+========================================
+
+By City:
+EVALUATE CALCULATETABLE(ROW("Rental CY", SUM('CurMonData'[Rental Expense - Current Year]), "Rental PY", SUM('CurMonData'[Rental Expense - Prior Year]), "Depreciation CY", SUM('CurMonData'[Depreciation - Current Year]), "Depreciation PY", SUM('CurMonData'[Depreciation - Prior Year]), "Janitorial CY", SUM('CurMonData'[Janitorial - Current Year]), "Janitorial PY", SUM('CurMonData'[Janitorial - Prior Year]), "Insurance CY", SUM('CurMonData'[Insurance - Current Year]), "Facility Cost CY", SUM('CurMonData'[Facility Cost - Current Year]), "Total CY", SUM('CurMonData'[Total Current Year Expenses YTD]), "Total PY", SUM('CurMonData'[Total Prior Year Expenses])), 'CurMonData'[City] = "Comodoro Rivadavia")
+
+By Country:
+EVALUATE CALCULATETABLE(ROW("Rental CY", SUM('CurMonData'[Rental Expense - Current Year]), "Rental PY", SUM('CurMonData'[Rental Expense - Prior Year]), "Depreciation CY", SUM('CurMonData'[Depreciation - Current Year]), "Depreciation PY", SUM('CurMonData'[Depreciation - Prior Year]), "Janitorial CY", SUM('CurMonData'[Janitorial - Current Year]), "Janitorial PY", SUM('CurMonData'[Janitorial - Prior Year]), "Insurance CY", SUM('CurMonData'[Insurance - Current Year]), "Facility Cost CY", SUM('CurMonData'[Facility Cost - Current Year]), "Total CY", SUM('CurMonData'[Total Current Year Expenses YTD]), "Total PY", SUM('CurMonData'[Total Prior Year Expenses])), 'CurMonData'[Country Name] = "Australia")
+
+By Region:
+EVALUATE CALCULATETABLE(ROW("Rental CY", SUM('CurMonData'[Rental Expense - Current Year]), "Rental PY", SUM('CurMonData'[Rental Expense - Prior Year]), "Depreciation CY", SUM('CurMonData'[Depreciation - Current Year]), "Depreciation PY", SUM('CurMonData'[Depreciation - Prior Year]), "Janitorial CY", SUM('CurMonData'[Janitorial - Current Year]), "Janitorial PY", SUM('CurMonData'[Janitorial - Prior Year]), "Insurance CY", SUM('CurMonData'[Insurance - Current Year]), "Facility Cost CY", SUM('CurMonData'[Facility Cost - Current Year]), "Total CY", SUM('CurMonData'[Total Current Year Expenses YTD]), "Total PY", SUM('CurMonData'[Total Prior Year Expenses])), 'CurMonData'[Region] = "Asia Pacific")
+
+Global totals:
+EVALUATE ROW("Rental CY", CALCULATE(SUM('CurMonData'[Rental Expense - Current Year])), "Rental PY", CALCULATE(SUM('CurMonData'[Rental Expense - Prior Year])), "Depreciation CY", CALCULATE(SUM('CurMonData'[Depreciation - Current Year])), "Depreciation PY", CALCULATE(SUM('CurMonData'[Depreciation - Prior Year])), "Janitorial CY", CALCULATE(SUM('CurMonData'[Janitorial - Current Year])), "Janitorial PY", CALCULATE(SUM('CurMonData'[Janitorial - Prior Year])), "Insurance CY", CALCULATE(SUM('CurMonData'[Insurance - Current Year])), "Insurance PY", CALCULATE(SUM('CurMonData'[Insurance - Prior Year])), "Facility Cost CY", CALCULATE(SUM('CurMonData'[Facility Cost - Current Year])), "Facility Cost PY", CALCULATE(SUM('CurMonData'[Facility Cost - Prior Year])), "Total CY", CALCULATE(SUM('CurMonData'[Total Current Year Expenses YTD])), "Total PY", CALCULATE(SUM('CurMonData'[Total Prior Year Expenses])))
+
+Expense grouped by Region:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Region], "Rental CY", SUM('CurMonData'[Rental Expense - Current Year]), "Depreciation CY", SUM('CurMonData'[Depreciation - Current Year]), "Total CY", SUM('CurMonData'[Total Current Year Expenses YTD]))
+
+Expense grouped by Country:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Country Name], "Rental CY", SUM('CurMonData'[Rental Expense - Current Year]), "Depreciation CY", SUM('CurMonData'[Depreciation - Current Year]), "Total CY", SUM('CurMonData'[Total Current Year Expenses YTD]))
+
+
+========================================
+PATTERN 10: RISK SUMMARY
+========================================
+
+Full risk summary:
+EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]))
+
+Risk by Region:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Region], "Expired Contacts", SUM('CurMonData'[Expired Contacts]), "Active on Terminated", SUM('CurMonData'[Active Contracts on Terminated Sites]), "No Contracts", SUM('CurMonData'[Active Leased Sites w/No Contracts]))
+
+Risk by Country:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Country Name], "Expired Contacts", SUM('CurMonData'[Expired Contacts]), "Active on Terminated", SUM('CurMonData'[Active Contracts on Terminated Sites]), "No Contracts", SUM('CurMonData'[Active Leased Sites w/No Contracts]))
+
+
+========================================
+ADDITIONAL PATTERNS
+========================================
+
+PSL Cost Comparison:
+EVALUATE ROW("Wireline", CALCULATE(SUM('CurMonData'[Wireline and Perforating])), "Cementing", CALCULATE(SUM('CurMonData'[Cementing])), "Support", CALCULATE(SUM('CurMonData'[Support])), "Testing", CALCULATE(SUM('CurMonData'[Testing and Subsea])), "Baroid", CALCULATE(SUM('CurMonData'[Baroid])), "Drill Bits", CALCULATE(SUM('CurMonData'[Halliburton Drill Bits & Services])), "Project Mgmt", CALCULATE(SUM('CurMonData'[Halliburton Project Management])), "Landmark", CALCULATE(SUM('CurMonData'[Landmark Software & Services])), "Completion", CALCULATE(SUM('CurMonData'[Completion Tools])))
+
+Manager Lookup by Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('ManagersList'[Country Name], 'ManagersList'[Country Manager], 'ManagersList'[Region], 'ManagersList'[Area]), 'ManagersList'[Region] = "Latin America")
+
+Manager Lookup by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('ManagersList'[Country Manager], 'ManagersList'[Area]), 'ManagersList'[Country Name] = "Australia")
+
+Occupancy by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name], 'CurMonData'[#1 Occupant], 'CurMonData'[#2 Occupant], 'CurMonData'[#3 Occupant], 'CurMonData'[City]), 'CurMonData'[Country Name] = "Australia")
+
+Asset Financials by Region:
+EVALUATE SUMMARIZECOLUMNS('ZFAF'[Region], 'ZFAF'[Country], "Asset Value", SUM('ZFAF'[Asset Value]), "Budget", SUM('ZFAF'[Budget]))
+
+NBV Projection:
+EVALUATE ROW("NBV CY", CALCULATE([NBV_CY]), "NBV NY", CALCULATE([NBV_NY]), "NBV N2Y", CALCULATE([NBV_N2Y]), "NBV N3Y", CALCULATE([NBV_N3Y]), "NBV N4Y", CALCULATE([NBV_N4Y]), "NBV Total", CALCULATE([NBV_TotalAsset]))
+
+ROU Projection:
+EVALUATE ROW("ROU CY", CALCULATE(SUM('CurMonData'[Current Year ROU])), "ROU Dec PY", CALCULATE(SUM('CurMonData'[December Prior Year ROU])), "ROU NY", CALCULATE(SUM('CurMonData'[Next year ROU])), "ROU N2Y", CALCULATE(SUM('CurMonData'[Next 2 years ROU])), "ROU N3Y", CALCULATE(SUM('CurMonData'[Next 3 years ROU])), "ROU N4Y", CALCULATE(SUM('CurMonData'[Next 4 years ROU])))
+
+Master Overview (all KPIs):
+EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "Presentation Sites", CALCULATE([Count_Presentation]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]), "Building FT2", CALCULATE([Value_Building]), "Land FT2", CALCULATE([Value_Land]))
+
+
+========================================
+FILTER VALUES REFERENCE
+========================================
+
+Regions: Asia Pacific, Latin America, Europe, North America, Middle East North Africa, Africa
+
+Hemispheres: Eastern, Western
+
+Commercial/Housing: Commercial, Housing
+
+Active/Terminated: Active, Terminated
+
+PSL Names: Cementing, Wireline and Perforating, Support, Testing and Subsea, Baroid, Halliburton Drill Bits & Services, Halliburton Project Management, Landmark Software & Services, Completion Tools
+
+RE Regions: Australasia, Indonesia, Southeast Asia, Caspian, Africa Other North, Africa Other South, Europe, East Mediterranean, Qatar, Saudi Arabia, South Asia, Latin America, North America, Canada
+
+Countries: Australia, Argentina, Mexico, Colombia, Ecuador, Venezuela, Brazil, Peru, Bolivia, Chile, Suriname, Trinidad, Germany, Denmark, Austria, UK, Turkey, Azerbaijan, Kazakhstan, Saudi Arabia, Qatar, Oman, UAE, Angola, Nigeria, Kenya, Senegal, Namibia, South Africa, Cote d'Ivoire, USA, Canada, Indonesia, Philippines, Vietnam, Papua New Guinea, India, Egypt, Algeria, Albania
