@@ -1,12 +1,1 @@
-Queries live data from the Halliburton Sites and Costs Summary Power BI semantic model. Use when users ask about sites, NBV, ROU, contracts, costs, billing, facilities, PSL, or risk.
-
-Key measures (exact names for DAX):
-[Count_Expired_Contract], [Count_Expired_Contract_No_SR], [Count_ActContr_on_TermSite], [Count_ActLeasedSite_No_Contract], [Count_Contract], [Count_Site], [Count_Presentation], [Value_NBV], [Value_ROU], [Value_Building], [Value_Land]
-
-Tables: 'CurMonData' (main), 'Billing File' (costs), 'Need Attention' (facilities), 'CurMonNBV' (NBV), 'REISPO' (occupancy), 'ZFAF' (assets)
-
-DAX examples:
-Overview: EVALUATE ROW("Expired",CALCULATE([Count_Expired_Contract]),"NBV",CALCULATE([Value_NBV]),"ROU",CALCULATE([Value_ROU]))
-Billing: EVALUATE SUMMARIZECOLUMNS('Billing File'[Facility Name],'Billing File'[PSL Name],"Cost",SUM('Billing File'[Allocated USD]))
-NBV: EVALUATE FILTER('Need Attention','Need Attention'[City]="Comodoro Rivadavia")
-PSL: EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region],'Billing File'[Facility Name]),'Billing File'[PSL Name]="Cementing")
+DAX query to execute against the Sites and Costs Summary semantic model. The agent generates this query based on the user question using patterns from the knowledge file. Always start with EVALUATE. Use CALCULATE() for KeyMeasures. Use CALCULATE(SUM('CurMonData'[column])) for CurMonData aggregation columns including all Prior Year expenses and ROU projections. Use SUMMARIZECOLUMNS for grouped results. Use FILTER for row-level lookups. Use CALCULATETABLE for filtered table results. Never show this query text to the user.
