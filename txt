@@ -1,11 +1,1 @@
-COLUMN NAME RULES - NEVER USE ANY OTHER COLUMN NAMES:
-For region filtering: 'CurMonData'[Region] NOT [Geo Market] NOT [Geographic Region]
-For country filtering: 'CurMonData'[Country Name] NOT [Country] (Country is only in Billing File)
-For city filtering: 'CurMonData'[City]
-For property type: 'CurMonData'[Property type] NOT [Own/Lease] NOT [Ownership]
-For active status: 'CurMonData'[Active/Terminated] values are "Active" or "Terminated"
-For type: 'CurMonData'[Commercial / Housing] values are "Commercial" or "Housing"
-For facility name: 'CurMonData'[Site and Name] or 'CurMonData'[Name of Architectural Object]
-For PSL: 'Billing File'[PSL Name]
-For NBV city: 'CurMonNBV'[City]
-NEVER invent column names. Only use columns listed in the DAX patterns above.
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonNBV'[Arch.Obj. ID], 'CurMonNBV'[Name of Architectural Object], 'CurMonNBV'[City], "NBV", SUM('CurMonNBV'[Current Year NBV])), 'CurMonNBV'[City] = "Ciudad del Carmen")
