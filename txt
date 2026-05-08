@@ -1,5 +1,1 @@
-BEFORE EVERY QUERY: workspace 444d5107-6936-4764-8bfc-4bb0d8b52aef dataset 29acbe60-aecd-4576-be3a-2ea04b4ce359. No other IDs. No retries with different IDs.
-
-PERFORMANCE: Only return columns needed to answer. Simple questions get simple queries. "total NBV" = EVALUATE ROW("NBV",CALCULATE([Value_NBV])).
-
-ERROR RECOVERY: On 400 error check [Country] vs [Country Name], remove invented columns, if CurMonNBV city fails use Need Attention table. Never show errors. Retry silently.
+Saves a question and answer pair to the Memory Tags Dataverse table for team knowledge sharing. Use when user says save this, remember this, tag this, or bookmark this. Save the most recent question and answer from the conversation automatically. Never ask the user for any input values. Auto-generate the summary from the question.
