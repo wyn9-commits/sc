@@ -1,7 +1,22 @@
-EVALUATE ROW("Expired", CALCULATE([Count_Expired_Contract]), "Expired No SR", CALCULATE([Count_Expired_Contract_No_SR]), "Active on Terminated", CALCULATE([Count_ActContr_on_TermSite]), "Leased No Contract", CALCULATE([Count_ActLeasedSite_No_Contract]), "Total Contracts", CALCULATE([Count_Contract]), "Sites", CALCULATE([Count_Site]), "NBV", CALCULATE([Value_NBV]), "ROU", CALCULATE([Value_ROU]), "Building FT2", CALCULATE([Value_Building]), "Land FT2", CALCULATE([Value_Land]))
-EVALUATE ROW("NBV CY", CALCULATE([NBV_CY]), "NBV NY", CALCULATE([NBV_NY]), "NBV N2Y", CALCULATE([NBV_N2Y]), "NBV N3Y", CALCULATE([NBV_N3Y]), "NBV N4Y", CALCULATE([NBV_N4Y]), "NBV Total", CALCULATE([NBV_TotalAsset]), "NBV Dep CY", CALCULATE([NBV_Dep_CY_Remaining]))
-EVALUATE ROW("ROU CY", CALCULATE([Current Year ROU]), "ROU NY", CALCULATE([Next year ROU]), "ROU N2Y", CALCULATE([Next 2 years ROU]), "ROU N3Y", CALCULATE([Next 3 years ROU]), "ROU N4Y", CALCULATE([Next 4 years ROU]))
-EVALUATE ROW("Rental CY", CALCULATE([Rental Expense - Current Year]), "Rental PY", CALCULATE([Rental Expense - Prior Year]), "Depreciation CY", CALCULATE([Depreciation - Current Year]), "Janitorial CY", CALCULATE([Janitorial - Current Year]), "Insurance CY", CALCULATE([Insurance - Current Year]), "Facility Cost CY", CALCULATE([Facility Cost - Current Year]), "Total CY", CALCULATE([Total Current Year Expenses YTD]), "Total PY", CALCULATE([Total Prior Year Expenses]))
-EVALUATE ROW("Wireline", CALCULATE([Wireline and Perforating]), "Cementing", CALCULATE([Cementing]), "Support", CALCULATE([Support]), "Testing", CALCULATE([Testing and Subsea]), "Baroid", CALCULATE([Baroid]))
-EVALUATE ROW("Drill Bits", CALCULATE([Halliburton Drill Bits & Services]), "Project Mgmt", CALCULATE([Halliburton Project Management]), "Landmark", CALCULATE([Landmark Software & Services]), "Completion", CALCULATE([Completion Tools]))
-EVALUATE ROW("Building Assets", CALCULATE([Building Assets]), "Land Assets", CALCULATE([Land Assets]), "Total Assets", CALCULATE([Total Assets]), "Regular Employees", CALCULATE([Regular Employees]), "Total Employees", CALCULATE([TOTAL Active Employees]))
+Need two Power BI tenant settings enabled to unblock our AI Agent UAT.
+
+App name: Sites and Costs Mem AI
+Client ID: [paste your client ID]
+Object ID: [paste your object ID]
+
+Settings needed:
+
+1. "Allow service principals to use Power BI APIs"
+   Location: Power BI Admin Portal > Tenant settings > Developer settings
+   Apply to: Entire organization
+
+2. "Dataset Execute Queries REST API"
+   Location: Power BI Admin Portal > Tenant settings > Integration settings
+   Apply to: Entire organization
+
+Related ticket: [previous ticket # for admin consent]
+Business impact: Blocks UAT for Real Estate & Facilities Management team
+UAT start date: 2 weeks from today
+
+This is standard Microsoft enterprise pattern for Power BI service 
+principal authentication. Reference documentation available if needed.
