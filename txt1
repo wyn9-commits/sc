@@ -22,3 +22,9 @@ This is standard Microsoft enterprise pattern for Power BI service
 principal authentication. Reference documentation available if needed.
 
 https://api.powerbi.com/v1.0/myorg/groups/444d5107-6936-4764-8bfc-4bb0d8b52aef/datasets/29acbe60-aecd-4576-be3a-2ea04b4ce359/executeQueries
+
+{
+  "queries": [
+    {"query": "EVALUATE ROW(\"NBV\", CALCULATE([Value_NBV]))"}
+  ]
+}
