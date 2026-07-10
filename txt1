@@ -28,3 +28,10 @@ https://api.powerbi.com/v1.0/myorg/groups/444d5107-6936-4764-8bfc-4bb0d8b52aef/d
     {"query": "EVALUATE ROW(\"NBV\", CALCULATE([Value_NBV]))"}
   ]
 }
+
+
+
+{
+  "queries": [{"query": "EVALUATE ROW(\"NBV\", CALCULATE([Value_NBV]))"}],
+  "impersonatedUserName": "your.email@halliburton.com"
+}
