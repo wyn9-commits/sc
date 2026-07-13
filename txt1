@@ -35,3 +35,12 @@ https://api.powerbi.com/v1.0/myorg/groups/444d5107-6936-4764-8bfc-4bb0d8b52aef/d
   "queries": [{"query": "EVALUATE ROW(\"NBV\", CALCULATE([Value_NBV]))"}],
   "impersonatedUserName": "your.email@halliburton.com"
 }
+
+
+- Service Principal: Sites and Costs Mem AI
+- Application (client) ID: 88622e54-36e8-4ab6-9f67-7236d6dd7d50
+- Service Principal Object ID: b33cc7ee-b490-469c-b644-8a38fa26b6fd
+- Dataset: Sites and Costs Summary
+- Dataset ID: 29acbe60-aecd-4576-be3a-2ea04b4ce359
+- Workspace: RES Dashboard
+- Workspace ID: 444d5107-6936-4764-8bfc-4bb0d8b52aef
