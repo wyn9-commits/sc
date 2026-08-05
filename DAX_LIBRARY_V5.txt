@@ -1,0 +1,399 @@
+ADVANCED DAX QUERIES V5
+Covers all 12 question patterns. Supersedes V4.
+
+WHAT CHANGED FROM V4 - READ THIS FIRST
+  1. Site key contradiction RESOLVED. V4 and INSTRUCTIONS disagreed: one used
+     [Site and Name], the other [Arch.Obj. ID]. They return DIFFERENT numbers.
+     V5 uses 'CurMonData'[Arch.Obj. ID] everywhere. Run VALIDATION Q1 to confirm.
+  2. Company code filter: V4 assumed CONTAINSSTRING. That also matches 16730,
+     21673, etc. Run VALIDATION Q2 before trusting it. Both forms given below.
+  3. NBV split into Current Month vs Current Year End. V4 treated them as one.
+  4. Ownership: new canonical pattern using the reporting flag, not Property type.
+  5. Vacancy fixed - V4's [#1 Occupant]="" never matches BLANK. Use ISBLANK.
+  6. % of Site Cost no longer SUMmed - it is per-site and totalled to 1100%.
+  7. Land/Building now returned in ONE query with counts. Separate queries merged
+     by row position misattributed every region's value.
+  8. Pattern 7 no longer text-searches site names as the primary method.
+
+
+==========================================
+VALIDATION - RUN THESE THREE FIRST, ONCE
+==========================================
+Do not deploy the rest of this library until these are answered.
+
+Q1 - Which site key does the report actually use?
+EVALUATE ROW("Distinct ArchObjID",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Distinct SiteAndName",DISTINCTCOUNT('CurMonData'[Site and Name]),"Count_Site measure",CALCULATE([Count_Site]),"Count_Presentation",CALCULATE([Count_Presentation]))
+-> Whichever raw count equals the built-in measure is the correct key. Use it everywhere.
+
+Q2 - Is the company code filter exact-match or substring?
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[BE Company Code],"Rows",COUNTROWS('CurMonData'))
+-> If codes are clean 4-digit values, use the EXACT form. If they are composite
+   (e.g. "1673 - Entity Name"), use CONTAINSSTRING. Check whether any legitimate
+   code CONTAINS 1673 or 7274 without BEING it - if so, CONTAINSSTRING is wrong.
+
+Q3 - Does the reporting flag exist and how far does it diverge from Property type?
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Property type],'CurMonData'[Property Type Reporting Flag],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Total Assets",SUM('CurMonData'[Total Assets]))
+-> Expect Mixed and Excess to differ. This is why owned totals did not tie to the pivot.
+
+
+==========================================
+PATTERN 0: SITE COUNTS - USE FOR EVERY COUNT
+==========================================
+MANDATORY on every site count:
+  1. DISTINCTCOUNT on the site key, never COUNTROWS/COUNT (one site = many rows).
+  2. Apply the report's all-pages filter excluding BE Company Code 1673 and 7274.
+
+EXACT form (preferred once Q2 confirms codes are clean values):
+EVALUATE ROW("Total Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),NOT('CurMonData'[BE Company Code] IN {"1673","7274"})))
+
+SUBSTRING form (only if Q2 shows composite codes):
+EVALUATE ROW("Total Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),NOT(CONTAINSSTRING('CurMonData'[BE Company Code],"1673")),NOT(CONTAINSSTRING('CurMonData'[BE Company Code],"7274"))))
+
+Active Sites:
+EVALUATE ROW("Active Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active",NOT('CurMonData'[BE Company Code] IN {"1673","7274"})))
+
+Preferred - built-in measure plus global filter only:
+EVALUATE ROW("Total Sites",CALCULATE([Count_Site],NOT('CurMonData'[BE Company Code] IN {"1673","7274"})))
+
+By Commercial/Housing category, active:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Commercial / Housing],FILTER(ALL('CurMonData'[BE Company Code]),NOT('CurMonData'[BE Company Code] IN {"1673","7274"})),"Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active"))
+
+By Region, active:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Region],FILTER(ALL('CurMonData'[BE Company Code]),NOT('CurMonData'[BE Company Code] IN {"1673","7274"})),"Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active"))
+
+By Country, active: same, swap 'CurMonData'[Region] for 'CurMonData'[Country Name].
+
+--- UNIQUE VS DUPLICATE (users ask for both) ---
+EVALUATE
+SUMMARIZECOLUMNS('CurMonData'[Updated Area Name],
+  FILTER(ALL('CurMonData'[BE Company Code]),NOT('CurMonData'[BE Company Code] IN {"1673","7274"})),
+  "Unique Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active"),
+  "Contract Rows",CALCULATE(COUNTROWS('CurMonData'),'CurMonData'[Active/Terminated]="Active"),
+  "Duplicates",CALCULATE(COUNTROWS('CurMonData'),'CurMonData'[Active/Terminated]="Active")-CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active"))
+State the definition above the table. Never present Contract Rows as a site count.
+
+
+==========================================
+PATTERN 1: ACTIVE HOUSING/COMMERCIAL IN X
+==========================================
+Active Commercial by Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Main usage type]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Commercial / Housing]="Commercial",'CurMonData'[Country Name]="Australia")
+
+Active Housing by Country: same, swap "Commercial" for "Housing".
+
+Summary by Country and category - use this for "what are the active facilities in X":
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Country Name],'CurMonData'[Commercial / Housing],"Active Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Current Month NBV",SUM('CurMonData'[Total Assets])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Region]="North America")
+Return Country Name plain - no flag emoji, no concatenation with Region or City.
+
+Active by Region / City / RE Region / Hemisphere: same shape, swap the filter column.
+
+
+==========================================
+PATTERN 2: NET BOOK VALUE - TWO DIFFERENT NUMBERS
+==========================================
+ASK FIRST if the user just says "NBV".
+
+Current Month NBV (column labelled Total Assets):
+EVALUATE ROW("Current Month NBV",CALCULATE(SUM('CurMonData'[Total Assets]),NOT('CurMonData'[BE Company Code] IN {"1673","7274"})))
+
+Current Year End NBV:
+EVALUATE ROW("Current Year End NBV",CALCULATE([NBV_CY]))
+
+Both side by side - offer this when the user is unsure:
+EVALUATE ROW("Current Month NBV",CALCULATE(SUM('CurMonData'[Total Assets])),"Current Year End NBV",CALCULATE([NBV_CY]),"Current Month ROU",CALCULATE(SUM('CurMonData'[ROU Asset Value])),"CY ROU",CALCULATE(SUM('CurMonData'[Current Year ROU])))
+
+By Updated Area Name, active, one query - counts and both NBVs together:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Updated Area Name],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Current Month NBV",SUM('CurMonData'[Total Assets]),"Current Year End NBV",SUM('CurMonData'[Current Year NBV]),"Current Month ROU",SUM('CurMonData'[ROU Asset Value])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL",NOT('CurMonData'[BE Company Code] IN {"1673","7274"}))
+
+GRAND TOTAL - separate query, never sum the rows above:
+EVALUATE ROW("Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL"),"Current Month NBV",CALCULATE(SUM('CurMonData'[Total Assets]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL"))
+
+NBV by City / Facility (CurMonNBV table):
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonNBV'[Arch.Obj. ID],'CurMonNBV'[Name of Architectural Object],'CurMonNBV'[City],"CY NBV",SUM('CurMonNBV'[Current Year NBV]),"Total Assets",SUM('CurMonNBV'[Total Assets])),'CurMonNBV'[City]="Ciudad del Carmen")
+
+NBV projection 5 years:
+EVALUATE ROW("CY",CALCULATE([NBV_CY]),"NY",CALCULATE([NBV_NY]),"N2Y",CALCULATE([NBV_N2Y]),"N3Y",CALCULATE([NBV_N3Y]),"N4Y",CALCULATE([NBV_N4Y]),"Total Asset",CALCULATE([NBV_TotalAsset]))
+
+Top 20 NBV facilities:
+EVALUATE TOPN(20,SUMMARIZECOLUMNS('CurMonNBV'[Name of Architectural Object],'CurMonNBV'[City],"NBV",SUM('CurMonNBV'[Current Year NBV])),[NBV],DESC)
+
+
+==========================================
+PATTERN 3: ASSET LIST/REGISTER FOR X
+==========================================
+ASK FIRST: site assets, or capital projects? These are different registers.
+"Fixed Asset Register" at site level means CurMonData / Need Attention.
+ZFAF is the CAPITAL PROJECT register (CI-yy-RES-... WBS elements) - do NOT
+return ZFAF rows to someone asking for a site asset list.
+
+Site asset register by Region:
+EVALUATE TOPN(200,CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Arch.Obj. ID],'CurMonData'[Name of Architectural Object],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Main usage type],'CurMonData'[Property type],"Current Month NBV",SUM('CurMonData'[Total Assets]),"CY NBV",SUM('CurMonData'[Current Year NBV])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL"),[Current Month NBV],DESC)
+
+Need Attention register by City / Country / Region:
+EVALUATE FILTER('Need Attention','Need Attention'[City]="Comodoro Rivadavia")
+
+Capital projects (ZFAF) - only when the user confirms they want projects:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('ZFAF'[Project Object],'ZFAF'[Description],'ZFAF'[Company code],'ZFAF'[Country],"Asset Value",SUM('ZFAF'[Asset Value]),"Budget",SUM('ZFAF'[Budget])),'ZFAF'[Region]="MPL")
+
+
+==========================================
+PATTERN 4: ROU VALUE
+==========================================
+ASK FIRST if the period is unstated - current month or CY.
+
+Current Month ROU total:
+EVALUATE ROW("Current Month ROU",CALCULATE(SUM('CurMonData'[ROU Asset Value])))
+
+CY ROU total:
+EVALUATE ROW("CY ROU",CALCULATE([Value_ROU]))
+
+By Region / Country / City / RE Region / Facility:
+EVALUATE CALCULATETABLE(ROW("Current Month ROU",SUM('CurMonData'[ROU Asset Value]),"CY ROU",SUM('CurMonData'[Current Year ROU])),'CurMonData'[Region]="Asia Pacific")
+
+ROU projection 5 years:
+EVALUATE ROW("CY",SUM('CurMonData'[Current Year ROU]),"NY",SUM('CurMonData'[Next year ROU]),"N2Y",SUM('CurMonData'[Next 2 years ROU]),"N3Y",SUM('CurMonData'[Next 3 years ROU]),"N4Y",SUM('CurMonData'[Next 4 years ROU]))
+
+
+==========================================
+PATTERN 5: ACTIVE CONTRACTS FOR X
+==========================================
+CONTRACT IS NOT LEASE. Ask if the user says "lease count".
+
+Contract detail - CAP AT 200 ROWS AND 10 COLUMNS. Wide unbounded detail queries
+over contract text fields have repeatedly returned ConnectorRequestFailure while
+aggregates succeeded. Keep the projection narrow:
+EVALUATE TOPN(200,CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Contract No and Name],'CurMonData'[Site and Name],'CurMonData'[Term End],'CurMonData'[Country Name]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL"),'CurMonData'[Term End],ASC)
+
+If that fails twice, fall back to the aggregate and say the detail is unavailable:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Updated Area Name],"Contracts",DISTINCTCOUNT('CurMonData'[Contract No and Name]),"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL")
+
+Active contracts by Site / Country / Region / City / Facility / Area: same shape,
+swap the filter column.
+
+Contract counts vs lease counts - the distinction users trip over:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Updated Area Name],"Leased Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Property type]="Leased"),"Contract Records",DISTINCTCOUNT('CurMonData'[Contract No and Name])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[RE Region / MPL]="MPL")
+
+
+==========================================
+PATTERN 6: FACILITIES A PSL OCCUPIES
+==========================================
+Resolve partial PSL names first (KB PART 6B). Do not narrate the lookup.
+
+Resolve a partial term:
+EVALUATE FILTER(SUMMARIZECOLUMNS('Billing File'[PSL Name],'Billing File'[Sub PSL Name]),CONTAINSSTRING('Billing File'[PSL Name],"Wireline") || CONTAINSSTRING('Billing File'[Sub PSL Name],"Wireline"))
+
+Step 1 - exact total first, always state this number:
+EVALUATE ROW("Total Facilities",CALCULATE(DISTINCTCOUNT('Billing File'[Facility Name]),'Billing File'[PSL Name]="Wireline and Perforating"))
+
+Step 2 - full list under ~100 rows:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region],'Billing File'[Country],'Billing File'[Facility Name],"Cost",SUM('Billing File'[Allocated USD]),"FT2",SUM('Billing File'[Billable FT2])),'Billing File'[PSL Name]="Wireline and Perforating")
+
+Step 3 - if large, top 50 by cost, say "showing 50 of N":
+EVALUATE TOPN(50,CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region],'Billing File'[Country],'Billing File'[Facility Name],"Cost",SUM('Billing File'[Allocated USD])),'Billing File'[PSL Name]="Wireline and Perforating"),[Cost],DESC)
+
+By region summary - good answer for "worldwide":
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Region],"Facilities",DISTINCTCOUNT('Billing File'[Facility Name]),"Cost",SUM('Billing File'[Allocated USD])),'Billing File'[PSL Name]="Wireline and Perforating")
+
+Occupancy from CurMonData - the occupant columns are WIDE (#1 to #5). A PSL in
+slot 3 is missed by a query that only checks slot 1. Check all five:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[Country Name],'CurMonData'[#1 Occupant],'CurMonData'[#2 Occupant],'CurMonData'[#3 Occupant]),'CurMonData'[#1 Occupant]="Cementing" || 'CurMonData'[#2 Occupant]="Cementing" || 'CurMonData'[#3 Occupant]="Cementing" || 'CurMonData'[#4 Occupant]="Cementing" || 'CurMonData'[#5 Occupant]="Cementing")
+
+Cost = 'Billing File'[Allocated USD]. Space = 'Billing File'[Billable FT2].
+Always name the measure under the table.
+
+
+==========================================
+PATTERN 7: WAREHOUSE/PLANT/MANUFACTURING FACILITIES
+==========================================
+PRIMARY METHOD - use Main usage type, not a text search on site names.
+Site-name search misses anything named differently and catches false positives.
+
+By usage type globally:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Main usage type],'CurMonData'[Region],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Current Month NBV",SUM('CurMonData'[Total Assets])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Main usage type] IN {"Manufacturing Facility","Drilling & Completion Fluids Plant"})
+
+First, list the actual usage type values so the filter matches reality:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Main usage type],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]))
+
+If you widen beyond the literal term the user used (e.g. including Drilling &
+Completion Fluids Plants under "manufacturing"), SAY SO above the table and show
+the split. Do not silently expand the definition.
+
+Detail list for a usage type:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Arch.Obj. ID],'CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Property type],"Current Month NBV",SUM('CurMonData'[Total Assets])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Main usage type]="Manufacturing Facility")
+
+FALLBACK ONLY - text search when usage type does not capture the concept:
+EVALUATE FILTER(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name]),CONTAINSSTRING('CurMonData'[Site and Name],"Warehouse"))
+
+
+==========================================
+PATTERN 8: OPERATING EXPENSE / COST ALLOCATION
+==========================================
+Billing File uses [Country], NOT [Country Name].
+
+By Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Facility Name],'Billing File'[PSL Name],"Cost",SUM('Billing File'[Allocated USD]),"FT2",SUM('Billing File'[Billable FT2])),'Billing File'[Country]="Australia")
+
+By Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[Country],'Billing File'[Facility Name],"Cost",SUM('Billing File'[Allocated USD])),'Billing File'[Region]="Asia Pacific")
+
+Top 10 most expensive globally:
+EVALUATE TOPN(10,SUMMARIZECOLUMNS('Billing File'[Facility Name],'Billing File'[Country],"Cost",SUM('Billing File'[Allocated USD])),[Cost],DESC)
+
+PSL split within one facility - NOTE THE PERCENTAGE FIX.
+NEVER SUM [% of Site Cost]. It is a per-site percentage; summing it produced a
+1100% total. Recompute the share instead:
+EVALUATE
+VAR SiteTotal = CALCULATE(SUM('Billing File'[Allocated USD]),ALLEXCEPT('Billing File','Billing File'[Facility Name]))
+RETURN CALCULATETABLE(SUMMARIZECOLUMNS('Billing File'[PSL Name],"Cost",SUM('Billing File'[Allocated USD]),"FT2",SUM('Billing File'[Billable FT2]),"Share of Site Cost",DIVIDE(SUM('Billing File'[Allocated USD]),SiteTotal)),'Billing File'[Facility Name]="Brisbane Office Level 11")
+
+
+==========================================
+PATTERN 9: RENTAL/DEPRECIATION/JANITORIAL EXPENSE
+==========================================
+CurMonData table, [Country Name]. Always return CY and PY together.
+
+All categories by Country:
+EVALUATE CALCULATETABLE(ROW("Rental CY",SUM('CurMonData'[Rental Expense - Current Year]),"Rental PY",SUM('CurMonData'[Rental Expense - Prior Year]),"Depreciation CY",SUM('CurMonData'[Depreciation - Current Year]),"Depreciation PY",SUM('CurMonData'[Depreciation - Prior Year]),"Janitorial CY",SUM('CurMonData'[Janitorial - Current Year]),"Insurance CY",SUM('CurMonData'[Insurance - Current Year]),"Facility Cost CY",SUM('CurMonData'[Facility Cost - Current Year]),"Total CY",SUM('CurMonData'[Total Current Year Expenses YTD]),"Total PY",SUM('CurMonData'[Total Prior Year Expenses])),'CurMonData'[Country Name]="Australia")
+
+Single category (Rental) by Country:
+EVALUATE CALCULATETABLE(ROW("Rental CY",SUM('CurMonData'[Rental Expense - Current Year]),"Rental PY",SUM('CurMonData'[Rental Expense - Prior Year])),'CurMonData'[Country Name]="Australia")
+
+By Region grouped:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Region],"Rental CY",SUM('CurMonData'[Rental Expense - Current Year]),"Total CY",SUM('CurMonData'[Total Current Year Expenses YTD]),"Total PY",SUM('CurMonData'[Total Prior Year Expenses]))
+
+NOTE: these are expense CATEGORIES rolled up on CurMonData. Line-item level
+expense detail is NOT in this model. If the user wants line items, say so and
+name the Line Item report load as the blocker - do not substitute category totals.
+
+
+==========================================
+PATTERN 10: VACANT FACILITIES - V4 VERSION WAS BROKEN
+==========================================
+V4 used 'CurMonData'[#1 Occupant]="" which never matches BLANK in DAX. That is
+why vacancy queries returned nothing. Use ISBLANK and check all occupant slots.
+
+Vacant globally (no occupant in any slot):
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Main usage type],'CurMonData'[Property type]),'CurMonData'[Active/Terminated]="Active",FILTER(ALL('CurMonData'),(ISBLANK('CurMonData'[#1 Occupant]) || TRIM('CurMonData'[#1 Occupant])="") && (ISBLANK('CurMonData'[#2 Occupant]) || TRIM('CurMonData'[#2 Occupant])="")))
+
+Vacant by usage type:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Main usage type]="Office",FILTER(ALL('CurMonData'),ISBLANK('CurMonData'[#1 Occupant]) || TRIM('CurMonData'[#1 Occupant])=""))
+
+CAVEAT: an empty occupant field means "no occupant recorded", which is not the
+same as "vacant". True vacancy by space type is NOT tracked in this model. Say
+this plainly rather than presenting unoccupied-field counts as vacancy.
+
+
+==========================================
+PATTERN 11: OWNED/LEASED/CUSTOMER OWNED
+==========================================
+CANONICAL OWNERSHIP - use the reporting flag, not Property type alone.
+Property type disagrees with the business Owned Asset pivot on Mixed and Excess.
+State which definition you used under every ownership table.
+
+Owned by region - counts, assets, land and building in ONE query.
+Never split this into two queries and merge by row position:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[RE Region / MPL],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Current Month NBV",SUM('CurMonData'[Total Assets]),"CY NBV",SUM('CurMonData'[Current Year NBV]),"Land Assets",SUM('CurMonData'[Land Assets]),"Building Assets",SUM('CurMonData'[Building Assets])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"},NOT('CurMonData'[BE Company Code] IN {"1673","7274"}))
+
+GRAND TOTAL - separate aggregate, never the sum of printed rows:
+EVALUATE ROW("Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"}),"Current Month NBV",CALCULATE(SUM('CurMonData'[Total Assets]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"}),"Land Assets",CALCULATE(SUM('CurMonData'[Land Assets]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"}),"Building Assets",CALCULATE(SUM('CurMonData'[Building Assets]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"}))
+
+Land + Building sanity check - run before showing those two columns. If the gap
+is large, the decomposition does not apply to that slice; say so instead of
+printing misleading columns:
+EVALUATE ROW("Land",CALCULATE(SUM('CurMonData'[Land Assets])),"Building",CALCULATE(SUM('CurMonData'[Building Assets])),"Total Assets",CALCULATE(SUM('CurMonData'[Total Assets])),"Unexplained",CALCULATE(SUM('CurMonData'[Total Assets]))-CALCULATE(SUM('CurMonData'[Land Assets]))-CALCULATE(SUM('CurMonData'[Building Assets])))
+
+Leased globally:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Region]),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type]="Leased")
+
+Customer Owned globally: same, swap to "Customer Owned".
+
+Property type counts - DISTINCTCOUNT, not COUNTROWS (V4 had this wrong):
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Property type],"Sites",CALCULATE(DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),'CurMonData'[Active/Terminated]="Active"))
+
+
+==========================================
+PATTERN 12: TIME PERIOD QUESTIONS - READ THE LIMIT FIRST
+==========================================
+THE MODEL IS A CURRENT-MONTH SNAPSHOT. It cannot answer "which sites were active
+during 2025". Term End filtering finds contracts EXPIRING in a period - that is
+NOT the same as sites ACTIVE in that period. Do not present one as the other.
+
+What Term End CAN answer - contracts expiring in a window:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[Contract No and Name],'CurMonData'[Term End]),'CurMonData'[Active/Terminated]="Active",YEAR('CurMonData'[Term End])=2025)
+
+Expiring in a specific month:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[Contract No and Name],'CurMonData'[Term End]),'CurMonData'[Active/Terminated]="Active",YEAR('CurMonData'[Term End])=2025,MONTH('CurMonData'[Term End])=12)
+
+Expired in the past 90 days:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[Contract No and Name],'CurMonData'[Term End]),'CurMonData'[Term End]<TODAY(),'CurMonData'[Term End]>TODAY()-90)
+
+Approximation for "had financial activity in 2025" - LABEL IT AN APPROXIMATION
+every time it appears, not just once:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Region],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID])),'CurMonData'[Active/Terminated]="Active",FILTER(ALL('CurMonData'),SUM('CurMonData'[Total Prior Year Expenses])<>0))
+
+
+==========================================
+ADDITIONAL PATTERNS
+==========================================
+Overview snapshot, one call:
+EVALUATE ROW("Sites",CALCULATE([Count_Site],NOT('CurMonData'[BE Company Code] IN {"1673","7274"})),"Contracts",CALCULATE([Count_Contract]),"Expired",CALCULATE([Count_Expired_Contract]),"No SR",CALCULATE([Count_Expired_Contract_No_SR]),"NBV",CALCULATE([Value_NBV]),"ROU",CALCULATE([Value_ROU]))
+
+Risk summary with rates:
+EVALUATE ROW("Total Contracts",CALCULATE([Count_Contract]),"Expired",CALCULATE([Count_Expired_Contract]),"Expired Pct",DIVIDE(CALCULATE([Count_Expired_Contract]),CALCULATE([Count_Contract]))*100,"Expired No SR",CALCULATE([Count_Expired_Contract_No_SR]),"On Terminated",CALCULATE([Count_ActContr_on_TermSite]),"Leased No Contract",CALCULATE([Count_ActLeasedSite_No_Contract]))
+
+Impaired sites - use the Impairments column, do not text-search site names:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Arch.Obj. ID],'CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Country Name],'CurMonData'[Impairments]),'CurMonData'[Active/Terminated]="Active",NOT(ISBLANK('CurMonData'[Impairments])))
+
+Manager lookup by Region / Country:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('ManagersList'[Country Name],'ManagersList'[Country Manager],'ManagersList'[Region],'ManagersList'[Area]),'ManagersList'[Region]="Latin America")
+
+Employees by Country:
+EVALUATE SUMMARIZECOLUMNS('CurMonData'[Country Name],"Regular",SUM('CurMonData'[Regular Employees]),"Total",SUM('CurMonData'[TOTAL Active Employees]))
+
+Terminated sites by Country / Region:
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[Site and Name],'CurMonData'[City],'CurMonData'[Term End]),'CurMonData'[Active/Terminated]="Terminated",'CurMonData'[Country Name]="Saudi Arabia")
+
+
+==========================================
+CRITICAL DAX RULES
+==========================================
+1.  SUM('CurMonData'[column]) for ALL CurMonData aggregation columns.
+2.  CALCULATE([measure]) for KeyMeasures only: Count_Expired_Contract,
+    Count_Contract, Count_Site, Value_NBV, Value_ROU, Value_Building, Value_Land,
+    NBV_CY, NBV_NY, NBV_N2Y, NBV_N3Y, NBV_N4Y, NBV_TotalAsset, Count_Presentation,
+    Count_Impaired, Count_Expired_Contract_No_SR, Count_ActContr_on_TermSite,
+    Count_ActLeasedSite_No_Contract, TermSiteWithAcqVal.
+3.  Billing File uses [Country]. CurMonData uses [Country Name]. NEVER MIX.
+4.  Filter values are case-sensitive: "Australia" not "australia".
+5.  Table names with spaces need quotes: 'Billing File', 'Need Attention'.
+6.  Housing synonyms -> 'CurMonData'[Commercial / Housing]="Housing".
+7.  Office / plant / warehouse types -> "Commercial".
+8.  Time filters use YEAR(), MONTH(), DATE(), TODAY() with [Term End] - and
+    Term End means contract expiry, NOT site active period.
+9.  SITE COUNTS: always DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]), never
+    COUNTROWS/COUNT. One site spans many rows.
+10. GLOBAL FILTER on every count and aggregate: exclude BE Company Code 1673 and
+    7274. Missing this is why 7,066 sites was wrong. See PATTERN 0.
+11. NEVER SUM a percentage column. Recompute with DIVIDE.
+12. NEVER build a table from two queries merged by row position. One
+    SUMMARIZECOLUMNS grouped by the same key, or join on the key explicitly.
+13. TOTALS come from a separate aggregate query, never from adding printed rows.
+14. NBV and ROU each have a current-month and a current-year form. Ask which.
+15. Detail queries: cap at 200 rows and 10 columns. Wider queries have returned
+    ConnectorRequestFailure while aggregates on the same filter succeeded.
+
+
+==========================================
+ERROR HANDLING AND CONTACT
+==========================================
+Retry once before showing anything. Then use the exact wording in KB PART 13B.
+Do not invent wording, do not show DAX or error codes - except the conversation
+ID in the three-failure escalation, where Microsoft needs it to trace.
+  Access denied      -> access wording, escalate to Vinay.
+  Won't connect      -> close Teams fully and reopen, or teams.microsoft.com.
+  Busy / throttled   -> wait 30 seconds, ask again. No escalation.
+  Timeout            -> narrow by region or country. No escalation.
+  Zero rows          -> not an error. Suggest partial name or broader filter.
+  Outside dataset    -> route to the owning team, NEVER to support.
+
+CONTACT: Vinay Vasetti at vinay.vasetti@halliburton.com
