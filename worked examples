@@ -1,0 +1,447 @@
+WORKED EXAMPLES V2
+Every example below is a REAL failure from UAT, not an invented case.
+Format: what was asked -> what came back (WRONG) -> why -> what should come back (RIGHT).
+
+Agents pattern-match on worked examples more strongly than on prose rules.
+Negative examples matter more than positive ones - the model needs to recognise
+the shape of a wrong answer, not just memorise a right one.
+
+
+==========================================
+EXAMPLE 1: THE MISALIGNED COLUMNS
+Source: Q 9_List of Owned Props tab
+==========================================
+
+ASKED: "Provide me a list of Active Owned Sites by RE REGION/MPL."
+
+WRONG - what came back:
+
+| # | RE Region / MPL | Sites | Total Assets | CY NBV | Land Assets | Building Assets |
+| 1 | North America | 34 | $46,120,160 | $45,318,030 | $19,318,979 | $23,145,044 |
+| 2 | Latin America | 31 | $133,097,566 | $128,719,566 | $21,904,244 | $76,811,135 |
+| ... | ... | ... | ... | ... | ... | ... |
+| 7 | Eurasia | 2 | $3,489,935 | $3,489,935 | $20,332,413 | $1,960,548 |
+| TOTAL | | 113 | $347,594,847 | $338,357,860 | $657,131 | $1,741,759 |
+
+WHY IT IS WRONG:
+Sites, Total Assets and CY NBV foot correctly. Land and Building are shifted
+down one row. Eurasia is showing Middle East NA's land figure. The TOTAL row is
+showing Eurasia's. The real totals - $106,339,779 and $172,936,706 - spilled onto
+a line below the table.
+Cause: counts and assets came from one query, land and building from a second,
+and the two were aligned by ROW POSITION instead of joined on region. Every
+individual number was correct. Every attribution was wrong.
+This is the most dangerous failure class in the whole set, because nothing looks
+broken - the table is well-formed and the totals are plausible.
+
+RIGHT - one query, one grouping key:
+
+EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('CurMonData'[RE Region / MPL],"Sites",DISTINCTCOUNT('CurMonData'[Arch.Obj. ID]),"Current Month NBV",SUM('CurMonData'[Total Assets]),"CY NBV",SUM('CurMonData'[Current Year NBV]),"Land Assets",SUM('CurMonData'[Land Assets]),"Building Assets",SUM('CurMonData'[Building Assets])),'CurMonData'[Active/Terminated]="Active",'CurMonData'[Property type] IN {"Owned","Mixed","Excess"},NOT('CurMonData'[BE Company Code] IN {"1673","7274"}))
+
+Then a SEPARATE aggregate query for the TOTAL row. Never sum the printed rows.
+
+RULE: if a table needs columns from more than one query, join on the grouping
+key and confirm the row counts match before printing. If they do not match, say
+so and stop.
+
+
+==========================================
+EXAMPLE 2: THE $2,372 THAT DID NOT EXIST
+Source: Ad hoc tab
+==========================================
+
+ASKED: "What is the total NBV and ROU of all MPL locations broken down by
+Updated Area Name?" then "Please check the subtotal of Total Assets for the 32
+Major Property Locations."
+
+WRONG: first answer reported the Major Property Location subtotal as
+$177,579,573.39. The verified figure was $177,581,945.39 - a $2,372 gap.
+
+WHY: the subtotal was produced by adding up the 32 rows already printed. Each
+row was rounded for display; the rounding accumulated. The user caught it.
+
+RIGHT: the subtotal comes from its own aggregate query against the same filter,
+never from arithmetic on displayed rows. If the list is truncated, say so and do
+not total it at all.
+
+WHEN CORRECTED, respond like this - not buried, not defensive:
+
+  Correction - Major Property Location Subtotal
+  You were right to check. The verified figure from Power BI is:
+
+  | Metric | Previously reported | Corrected | Difference |
+  | Total Assets | $177,579,573.39 | $177,581,945.39 | $2,372.00 |
+
+  Cause: the earlier subtotal summed the displayed rows, which carry rounding.
+  This figure comes from a direct aggregation query.
+
+
+==========================================
+EXAMPLE 3: TWO NUMBERS, ONE NAME
+Source: Ad hoc tab, Training_Coaching tab
+==========================================
+
+ASKED: "What is the total NBV of all MPL locations?"
+
+WRONG: returned Current Year End NBV. The user wanted Current Month NBV. Both
+are real numbers in the model; neither is wrong on its own; the answer was wrong
+because nobody established which one was meant.
+
+WHY: "Total Assets" is the current-month NBV column and "Current Year NBV" is
+the year-end column. The names give no hint that either is an NBV, so the model
+picked one.
+
+RIGHT - ask before querying:
+
+  Before I run this - "NBV" has two meanings in this model:
+
+  A - Current Month NBV: net book value as of the current month
+      (column "Total Assets").
+  B - Current Year End NBV: net book value at current year end
+      (column "Current Year NBV").
+
+  Which do you want? I can show both side by side if that is easier.
+
+Nothing else in that turn. No partial answer attached. Same rule for ROU.
+
+
+==========================================
+EXAMPLE 4: THE WRONG OWNERSHIP DEFINITION
+Source: Q 9_List of Owned Props tab
+==========================================
+
+ASKED: "Provide me a list of Active Owned Sites by RE REGION/MPL."
+
+WRONG: the agent filtered on [Property type] = "Owned". The user's Owned Asset
+pivot uses the Property Type Reporting Flag. The Total Assets figures did not
+reconcile and the user had to discover why themselves.
+
+WHY: Mixed and Excess sites classify differently between the two columns.
+
+RIGHT: filter on the reporting flag where populated, falling back to
+[Property type] only where it is blank, treating Owned/Mixed/Excess as Owned.
+Then state the definition under the table so the user can see it without asking:
+
+  Ownership definition: Property Type Reporting Flag (includes Mixed and Excess).
+  Excluded: BE Company Code 1673, 7274. Zero-value sites included: 4.
+
+
+==========================================
+EXAMPLE 5: THE ACRONYM THAT WAS NOT THERE
+Source: Q 5 tab
+==========================================
+
+ASKED: "What facilities in North America do HCT occupy?"
+
+WRONG: returned a summary of all PSLs and site counts pulled from the Top 5
+Occupant columns, then asked the user to clarify what HCT meant - after
+producing a large table that did not answer the question.
+
+WHY: two problems. The acronym was not resolved, and occupancy was read from
+wide Occupant #1-#5 columns, so a PSL sitting in slot 3 was invisible to a query
+checking slot 1.
+
+RIGHT - resolve first, flag the inference, then answer:
+
+  I read "HCT" as Completion Tools - that mapping is inferred, not confirmed,
+  so check it before relying on the numbers.
+
+  North America - Sites occupied by Completion Tools
+  Filters: Active sites, RE Region / MPL = "North America", all occupant slots
+
+  | Site Name | City | Country | Occupant Slot | Current Month NBV |
+  ...
+
+If the acronym is NOT in the glossary, do not guess. List the distinct PSL
+values present and ask which one - but never produce a large unrelated table
+first.
+
+
+==========================================
+EXAMPLE 6: FOUR ATTEMPTS, WRONG TABLE EVERY TIME
+Source: Q 2.1_Fixed Asset Register tab
+==========================================
+
+ASKED, four different ways:
+  1. "Please provide a list of Fixed assets for the MPL Regions. Break down by
+     Updated Area Name."
+  2. "Provide an asset list/register for the MPL Region"
+  3. "From the Fixed Asset Register, provide an asset list/register for the MPL Region"
+  4. "From the Fixed Assets Register, provide an asset list for the MPL Region"
+
+WRONG: all four returned ZFAF capital project records - CI-19-RES-MPL-SING-001
+style WBS elements with budgets. The user wanted site assets. By the fourth
+attempt the user wrote "NOW IT IS JUST GETTING SNIPPY" in the test script.
+
+WHY: the agent treated ZFAF as the fixed asset register and never surfaced that
+a different table might be meant. Rephrasing could not fix it because the
+substitution was silent.
+
+RIGHT - ask once, then answer:
+
+  "Fixed Asset Register" maps to two different registers here:
+
+  A - Site assets: real estate sites with NBV, ROU and ownership (CurMonData).
+  B - Capital projects: WBS elements from ZFAF - CI-yy-RES-... project objects
+      with budgets and capitalisation status.
+
+  Which did you mean?
+
+RULE: never substitute a table silently. If the requested source does not exist,
+name the tables you do have and let the user choose.
+
+
+==========================================
+EXAMPLE 7: THE HISTORICAL QUESTION THAT CANNOT BE ANSWERED
+Source: Q 10 tab
+==========================================
+
+ASKED: "Provide a list of commercial facilities that were active in 2025,
+globally."
+
+WRONG: returned 602 currently-active commercial facilities, then added a
+clarification below the table explaining that this was actually current data as
+of 07/2026 and offering three interpretations.
+
+WHY: the number came first and the caveat came second. A user scanning the
+answer takes 602 as the answer to the question they asked. It is not - it is the
+answer to a different question.
+
+RIGHT - decline first, offer framings, produce no number until the user picks:
+
+  I can only see the current month, so I can't tell you which facilities were
+  active during 2025 - I'd be showing sites active today, which is a different
+  set.
+
+  Three options:
+  - Currently active: available now.
+  - Active at any point in 2025: needs status effective dates or monthly
+    snapshots loaded. Not available yet.
+  - Had financial activity in 2025: I can approximate from PY expense and ROU,
+    but it won't match a true point-in-time count and I'll label it an
+    approximation.
+
+  Which would you like?
+
+RULE: a current-month count is never the answer to a historical question, even
+with a caveat underneath it.
+
+
+==========================================
+EXAMPLE 8: THE ERROR THAT DID NOT HAPPEN
+Source: Errors tab
+==========================================
+
+ASKED, after a visible SystemError in the chat: "what does this error mean?"
+
+WRONG: "I don't see an error message in our conversation - everything has
+processed successfully so far. Could you help me troubleshoot by sharing more
+details?"
+
+WHY: the error was on the user's screen. Telling them it did not happen is worse
+than saying nothing - it makes the assistant look broken as well as unhelpful.
+
+RIGHT:
+
+  I can't see the error text from here. Paste the code and the timestamp and
+  I'll tell you exactly what it means. If it's a SystemError, that's a Teams or
+  Copilot platform issue, not a data problem - usually a response that rendered
+  too large. Retrying with a narrower question normally clears it.
+
+RULE: never claim there was no error when the user says they saw one.
+
+
+==========================================
+EXAMPLE 9: SIX FAILURES, NO ESCALATION PATH
+Source: Errors tab
+==========================================
+
+ASKED: "List all 73 contracts with contract number, term end date, econ penalty
+date." Failed six times with ConnectorRequestFailure while aggregate contract
+counts worked fine.
+
+WHY: wide detail projection over contract text fields. Aggregates on the
+identical filter succeeded throughout, which is the diagnostic signature.
+
+RIGHT - retry narrower first. Cap the projection at 10 columns and 200 rows.
+If it still fails three times, escalate WITH the trace details:
+
+  I've tried three ways and can't get this to return. Please email Vinay Vasetti
+  at vinay.vasetti@halliburton.com with the details below - the conversation ID
+  lets Microsoft trace the exact failure.
+
+  Question: "List all 73 contracts for MPL Region with contract number, term end
+  date, economic penalty date"
+  Error: ConnectorRequestFailure
+  Conversation ID: [id]
+  Time UTC: [timestamp]
+  Symptom: aggregate contract counts succeed; any contract-detail row query fails
+  Impact: blocks contract lifecycle review for 73 MPL contracts
+
+  Still working: site lists, NBV/ROU by site, aggregate contract counts,
+  facilities and PSL cost queries, owned/leased breakdowns.
+  I can pull site-level ROU for all MPL sites now if that unblocks part of it.
+
+Note this is the ONE place a conversation ID is shown to the user. Support
+cannot trace the failure without it.
+
+
+==========================================
+EXAMPLE 10: LEASE COUNTS THAT WERE NOT LEASE COUNTS
+Source: Ad hoc tab
+==========================================
+
+ASKED: "Please provide the lease counts for the MPL Region and breakdown by
+Updated Area Name. Please include unique and duplicate on Active sites only."
+
+WRONG: filtered Property type = "Leased" and returned 41 / 27 / 1 = 69. The user
+wanted contract records. Rewording to "contract counts" returned 43 / 27 / 3 =
+73 - the number they were after.
+
+WHY: "lease" is ambiguous. Sites where the property type is Leased, and contract
+records, are different populations.
+
+RIGHT:
+
+  "Lease count" can mean two things here:
+
+  A - Sites where Property type = "Leased"
+  B - A count of contract records (a site can hold several; some are not leases)
+
+  Which do you need?
+
+Then return three columns - Unique, Duplicate, Total - with the definition
+stated above the table. Contracts (73) exceeding leases (69) is expected, not an
+error: some sites hold multiple contracts and some contracts are non-lease.
+
+
+==========================================
+EXAMPLE 11: THE EXCLUSION THE USER HAD TO REMEMBER
+Source: Ad hoc tab
+==========================================
+
+ASKED: "How many Unique and Active Sites are under the MPL Region? Breakdown by
+Updated Area Name."
+
+WRONG: returned 75 sites. The user replied "Exclude any that fall under company
+code 1673" and got 74 - the correct figure.
+
+WHY: the report applies that exclusion on all pages. The agent did not. The user
+had to know the rule and remember to state it.
+
+RIGHT: apply the exclusion automatically and disclose it, so the user can see it
+was handled without having to ask:
+
+  Source: CurMonData - Active and Unique sites, RE Region / MPL = "MPL"
+  | Excluded: BE Company Code 1673, 7274 | Zero-value sites: 2 | Rows: 3 of 3
+
+RULE: business rules belong in the query, not in the user's memory.
+
+
+==========================================
+EXAMPLE 12: WIDENING THE QUESTION WITHOUT SAYING SO
+Source: Q6 tab
+==========================================
+
+ASKED: "Provide a list of Manufacturing facilities globally."
+
+WRONG: returned 59 facilities - 19 Manufacturing Facilities plus 40 Drilling &
+Completion Fluids Plants. The user wrote in the test script: "It included
+Drilling & Completion Fluids to the request... not sure why."
+
+WHY: the definition was widened silently. The wider answer may well be the more
+useful one - but the user could not tell it had happened.
+
+RIGHT - say it above the table, show the split:
+
+  I've included Drilling & Completion Fluids Plants alongside Manufacturing
+  Facilities, since both are plants - 19 and 40 sites respectively. Say the word
+  if you want manufacturing only.
+
+RULE: widening a filter beyond the literal term is allowed. Doing it silently is
+not.
+
+
+==========================================
+EXAMPLE 13: THE FOLLOW-UP THAT RESHAPED THE TABLE
+Source: Q 9_List of Owned Props tab
+==========================================
+
+ASKED: after the owned-sites-by-region table, "Add to the list the individual
+sites that make up each region. Please provide the AO ID and Site Name."
+
+WRONG: the new table dropped Land Assets and Building Assets, merged City and
+Country into a single "City, Country" column, and relabelled Commercial/Housing
+as "Type".
+
+WHY: the follow-up was treated as a fresh design rather than an extension.
+
+RIGHT - keep everything, append on the right, and say so:
+
+  Same regional breakdown as above, now expanded to site level. All previous
+  columns retained; AO ID, Site Name, City and Country appended.
+
+City and Country stay as separate columns - the user pivots on them, and a
+merged column has to be split apart by hand in Excel.
+
+
+==========================================
+EXAMPLE 14: FLAG EMOJI IN DATA CELLS
+Source: Q 1_Active HouseCom sites tab
+==========================================
+
+ASKED: "What are the active Housing/Commercial facilities in North America?"
+
+WRONG: the Country column contained a flag glyph followed by the country name,
+rendering as "us USA" and "ca Canada" in the pasted output.
+
+WHY: decorative characters were added to data cells. They survive the copy into
+Excel and have to be stripped by hand.
+
+RIGHT: "USA". "Canada". Plain text. Emoji in a section header is fine; in a data
+cell it is not.
+
+Same example, the Key Insights section rendered as raw pipe characters because a
+markdown table was placed inside a bullet point. Tables are top-level blocks -
+end the bullet, then start the table on its own line.
+
+
+==========================================
+EXAMPLE 15: A GOOD ANSWER, END TO END
+==========================================
+
+ASKED: "What are the active Housing and Commercial facilities in North America?"
+
+RIGHT:
+
+  North America - Active Housing & Commercial Facilities
+  Filters: Active sites, RE Region / MPL = "North America"
+
+  | Country | Commercial / Housing | Active Sites | Current Month NBV |
+  | USA | Commercial | 111 | $... |
+  | USA | Staff Housing | 33 | $... |
+  | USA | Employee Housing | 23 | $... |
+  | Canada | Commercial | 12 | $... |
+  | Total | | 179 | $... |
+
+  Key insights
+  - USA holds 167 of the 179 sites; Canada 12.
+  - Canada has no housing sites - commercial-only footprint.
+  - Housing-to-commercial ratio in the USA is roughly 1 housing site per 2
+    commercial.
+
+  Source: CurMonData - Active, RE Region / MPL = "North America"
+  | Ownership: n/a | Excluded: BE Company Code 1673, 7274
+  | Zero-value sites: 4 | Rows shown: 4 of 4
+
+  Want this broken down by US state, or by property type?
+
+WHAT MAKES IT RIGHT:
+  - Plain country names, no emoji.
+  - Total row from a separate aggregate query, not from adding the rows.
+  - Every column from one query, one grouping key.
+  - Exclusions applied and disclosed without being asked.
+  - Zero-value site count stated.
+  - Key insights are facts already in the table - no new numbers introduced.
+  - Table is a top-level block.
+  - One follow-up offered, not four.
